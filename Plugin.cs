@@ -1,12 +1,13 @@
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using OrangeGuidanceTomestone.MiniPenumbra;
-using OrangeGuidanceTomestone.Util;
+using NorthStar.MiniPenumbra;
+using NorthStar.Util;
 
-namespace OrangeGuidanceTomestone;
+namespace NorthStar;
 
-public class Plugin : IDalamudPlugin {
+public class Plugin : IDalamudPlugin
+{
     internal static string Name => "Orange Guidance Tomestone";
 
     [PluginService]
@@ -53,42 +54,48 @@ public class Plugin : IDalamudPlugin {
 
     internal string AvfxFilePath { get; }
 
-    public Plugin() {
-        this.AvfxFilePath = this.CopyAvfxFile();
+    public Plugin()
+    {
+        AvfxFilePath = CopyAvfxFile();
 
-        this.Config = this.Interface!.GetPluginConfig() as Configuration ?? new Configuration();
-        this.Vfx = new Vfx(this);
-        this.Messages = new Messages(this);
-        this.Ui = new PluginUi(this);
-        this.ActorManager = new ActorManager(this);
-        this.VfxReplacer = new VfxReplacer(this);
-        this.Commands = new Commands(this);
-        this.Pinger = new Pinger(this);
+        Config = Interface!.GetPluginConfig() as Configuration ?? new Configuration();
+        Vfx = new Vfx(this);
+        Messages = new Messages(this);
+        Ui = new PluginUi(this);
+        ActorManager = new ActorManager(this);
+        VfxReplacer = new VfxReplacer(this);
+        Commands = new Commands(this);
+        Pinger = new Pinger(this);
 
-        if (this.Config.ApiKey == string.Empty) {
-            this.GetApiKey();
+        if (Config.ApiKey == string.Empty)
+        {
+            GetApiKey();
         }
     }
 
-    public void Dispose() {
-        this.Pinger.Dispose();
-        this.Commands.Dispose();
-        this.VfxReplacer.Dispose();
-        this.ActorManager.Dispose();
-        this.Ui.Dispose();
-        this.Messages.Dispose();
-        this.Vfx.Dispose();
+    public void Dispose()
+    {
+        Pinger.Dispose();
+        Commands.Dispose();
+        VfxReplacer.Dispose();
+        ActorManager.Dispose();
+        Ui.Dispose();
+        Messages.Dispose();
+        Vfx.Dispose();
     }
 
-    internal void SaveConfig() {
-        this.Interface.SavePluginConfig(this.Config);
+    internal void SaveConfig()
+    {
+        Interface.SavePluginConfig(Config);
     }
 
-    private string CopyAvfxFile() {
-        var configDir = this.Interface!.GetPluginConfigDirectory();
+    private string CopyAvfxFile()
+    {
+        var configDir = Interface!.GetPluginConfigDirectory();
         Directory.CreateDirectory(configDir);
-        for (var i = 0; i < Messages.VfxPaths.Length; i++) {
-            var letter = (char) ('a' + i);
+        for (var i = 0; i < Messages.VfxPaths.Length; i++)
+        {
+            var letter = (char)('a' + i);
             var stream = Resourcer.Resource.AsStreamUnChecked($"OrangeGuidanceTomestone.vfx.sign_{letter}.avfx");
             var path = Path.Join(configDir, $"sign_{letter}.avfx");
             stream.CopyTo(File.Create(path));
@@ -97,13 +104,15 @@ public class Plugin : IDalamudPlugin {
         return configDir;
     }
 
-    internal void GetApiKey() {
-        Task.Run(async () => {
+    internal void GetApiKey()
+    {
+        Task.Run(async () =>
+        {
             var resp = await new HttpClient().PostAsync("https://tryfingerbuthole.anna.lgbt/account", null);
             var key = await resp.Content.ReadAsStringAsync();
-            this.Config.ApiKey = key;
-            this.SaveConfig();
-            this.Framework.RunOnFrameworkThread(this.Messages.SpawnVfx);
+            Config.ApiKey = key;
+            SaveConfig();
+            Framework.RunOnFrameworkThread(Messages.SpawnVfx);
         });
     }
 }

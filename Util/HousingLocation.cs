@@ -1,11 +1,12 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game;
 
-namespace OrangeGuidanceTomestone.Util;
+namespace NorthStar.Util;
 
 /// <summary>
 /// Information about a player's current location in a housing ward.
 /// </summary>
-public class HousingLocation {
+public class HousingLocation
+{
     /// <summary>
     /// The housing ward that the player is in.
     /// </summary>
@@ -38,34 +39,44 @@ public class HousingLocation {
     /// </summary>
     public ushort? Apartment;
 
-    internal static unsafe HousingLocation? Current() {
+    internal static unsafe HousingLocation? Current()
+    {
         var manager = HousingManager.Instance();
         return manager == null ? null : new HousingLocation(manager);
     }
 
-    private unsafe HousingLocation(HousingManager* manager) {
+    private unsafe HousingLocation(HousingManager* manager)
+    {
         var ward = manager->GetCurrentWard();
         var currentPlot = manager->GetCurrentPlot();
-        if (currentPlot < -1) {
+        if (currentPlot < -1)
+        {
             // the struct is in apartment mode
-            this.ApartmentWing = (ushort?) ((unchecked((byte) currentPlot) & ~0x80) + 1);
-            this.Apartment = (ushort) manager->GetCurrentRoom();
-            if (this.Apartment == 0) {
-                this.Apartment = null;
+            ApartmentWing = (ushort?)((unchecked((byte)currentPlot) & ~0x80) + 1);
+            Apartment = (ushort)manager->GetCurrentRoom();
+            if (Apartment == 0)
+            {
+                Apartment = null;
             }
-        } else if (currentPlot > 0) {
-            if (manager->GetCurrentIndoorHouseId().Id == ulong.MaxValue) {
+        }
+        else if (currentPlot > 0)
+        {
+            if (manager->GetCurrentIndoorHouseId().Id == ulong.MaxValue)
+            {
                 // not inside a plot
                 // yard is 0xFF when not in one
-                this.Yard = (ushort?) (currentPlot + 1);
-            } else {
+                Yard = (ushort?)(currentPlot + 1);
+            }
+            else
+            {
                 // inside a plot
-                this.Plot = (ushort?) (currentPlot + 1);
+                Plot = (ushort?)(currentPlot + 1);
             }
         }
 
-        if (ward > -1) {
-            this.Ward = (ushort) (ward + 1);
+        if (ward > -1)
+        {
+            Ward = (ushort)(ward + 1);
         }
     }
 }

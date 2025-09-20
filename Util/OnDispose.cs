@@ -1,19 +1,23 @@
-namespace OrangeGuidanceTomestone.Util;
+namespace NorthStar.Util;
 
-internal class OnDispose : IDisposable {
+internal class OnDispose : IDisposable
+{
     private bool _disposed;
     private readonly Action _action;
 
-    internal OnDispose(Action action) {
-        this._action = action;
+    internal OnDispose(Action action)
+    {
+        _action = action;
     }
 
-    public void Dispose() {
-        if (this._disposed) {
+    public void Dispose()
+    {
+        if (_disposed)
+        {
             return;
         }
 
-        this._disposed = true;
-        this._action();
+        _disposed = true;
+        _action();
     }
 }

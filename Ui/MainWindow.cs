@@ -1,56 +1,69 @@
 using Dalamud.Bindings.ImGui;
+using NorthStar.Ui.MainWindowTabs;
 using System.Numerics;
-using OrangeGuidanceTomestone.Ui.MainWindowTabs;
 
-namespace OrangeGuidanceTomestone.Ui;
+namespace NorthStar.Ui;
 
-internal class MainWindow {
+internal class MainWindow
+{
     private Plugin Plugin { get; }
     private List<ITab> Tabs { get; }
 
     internal bool Visible;
     internal uint ExtraMessages;
 
-    internal MainWindow(Plugin plugin) {
-        this.Plugin = plugin;
-        this.Tabs = [
-            new Write(this.Plugin),
-            new MessageList(this.Plugin),
-            new Settings(this.Plugin),
+    internal MainWindow(Plugin plugin)
+    {
+        Plugin = plugin;
+        Tabs = [
+            new Write(Plugin),
+            new MessageList(Plugin),
+            new Settings(Plugin),
         ];
     }
 
-    internal void Draw() {
-        if (!this.Visible) {
+    internal void Draw()
+    {
+        if (!Visible)
+        {
             return;
         }
 
         ImGui.SetNextWindowSize(new Vector2(475, 350), ImGuiCond.FirstUseEver);
-        if (!ImGui.Begin(Plugin.Name, ref this.Visible)) {
+        if (!ImGui.Begin(Plugin.Name, ref Visible))
+        {
             ImGui.End();
             return;
         }
 
-        if (this.Plugin.Config.ApiKey == string.Empty) {
-            this.DrawApiKey();
-        } else {
-            this.DrawTabs();
+        if (Plugin.Config.ApiKey == string.Empty)
+        {
+            DrawApiKey();
+        }
+        else
+        {
+            DrawTabs();
         }
 
         ImGui.End();
     }
 
-    private void DrawTabs() {
-        if (!ImGui.BeginTabBar("##ogt-main-tabs")) {
+    private void DrawTabs()
+    {
+        if (!ImGui.BeginTabBar("##ogt-main-tabs"))
+        {
             return;
         }
 
-        foreach (var tab in this.Tabs) {
-            if (!ImGui.BeginTabItem(tab.Name)) {
+        foreach (var tab in Tabs)
+        {
+            if (!ImGui.BeginTabItem(tab.Name))
+            {
                 continue;
             }
 
-            if (ImGui.BeginChild("##tab-content")) {
+            if (ImGui.BeginChild("##tab-content"))
+            {
                 tab.Draw();
             }
 
@@ -62,7 +75,8 @@ internal class MainWindow {
         ImGui.EndTabBar();
     }
 
-    private void DrawApiKey() {
+    private void DrawApiKey()
+    {
         ImGui.PushTextWrapPos();
 
         ImGui.TextUnformatted($"Somehow, {Plugin.Name} wasn't able to register you an account automatically.");
@@ -70,8 +84,9 @@ internal class MainWindow {
 
         ImGui.PopTextWrapPos();
 
-        if (ImGui.Button("Register")) {
-            this.Plugin.GetApiKey();
+        if (ImGui.Button("Register"))
+        {
+            Plugin.GetApiKey();
         }
     }
 }

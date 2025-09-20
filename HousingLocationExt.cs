@@ -1,17 +1,20 @@
-﻿using OrangeGuidanceTomestone.Util;
+﻿using NorthStar.Util;
 
-namespace OrangeGuidanceTomestone;
+namespace NorthStar;
 
-internal static class HousingLocationExt {
+internal static class HousingLocationExt
+{
     internal const ushort Apt = 10_000;
     internal const ushort Wng = 5_000;
 
-    internal static ushort? CombinedPlot(this HousingLocation housing) {
-        return housing switch {
+    internal static ushort? CombinedPlot(this HousingLocation housing)
+    {
+        return housing switch
+        {
             // lobby
-            { Apartment: null, ApartmentWing: { } wang } => (ushort) (Apt + (wang - 1) * Wng),
+            { Apartment: null, ApartmentWing: { } wang } => (ushort)(Apt + (wang - 1) * Wng),
             // apartment
-            { Apartment: { } apt, ApartmentWing: { } wing } => (ushort) (Apt + (wing - 1) * Wng + apt),
+            { Apartment: { } apt, ApartmentWing: { } wing } => (ushort)(Apt + (wing - 1) * Wng + apt),
             // normal plot interior
             { Plot: { } plotNum } => plotNum,
             _ => null,

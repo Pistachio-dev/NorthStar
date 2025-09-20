@@ -1,49 +1,57 @@
-using System.Diagnostics;
 using Dalamud.Plugin.Services;
-using OrangeGuidanceTomestone.Helpers;
+using NorthStar.Helpers;
+using System.Diagnostics;
 
-namespace OrangeGuidanceTomestone;
+namespace NorthStar;
 
-internal class Pinger : IDisposable {
+internal class Pinger : IDisposable
+{
     private Plugin Plugin { get; }
     private Stopwatch Stopwatch { get; } = new();
     private int _waitSecs;
 
-    internal Pinger(Plugin plugin) {
-        this.Plugin = plugin;
+    internal Pinger(Plugin plugin)
+    {
+        Plugin = plugin;
 
-        this.Stopwatch.Start();
+        Stopwatch.Start();
 
-        this.Plugin.Framework.Update += this.Ping;
+        Plugin.Framework.Update += Ping;
     }
 
-    public void Dispose() {
-        this.Plugin.Framework.Update -= this.Ping;
+    public void Dispose()
+    {
+        Plugin.Framework.Update -= Ping;
     }
 
-    private void Ping(IFramework framework) {
-        if (this.Stopwatch.Elapsed < TimeSpan.FromSeconds(this._waitSecs)) {
+    private void Ping(IFramework framework)
+    {
+        if (Stopwatch.Elapsed < TimeSpan.FromSeconds(_waitSecs))
+        {
             return;
         }
 
-        this.Stopwatch.Restart();
+        Stopwatch.Restart();
 
-        if (this.Plugin.Config.ApiKey == string.Empty) {
-            this._waitSecs = 5;
+        if (Plugin.Config.ApiKey == string.Empty)
+        {
+            _waitSecs = 5;
             return;
         }
 
         // 30 mins
-        this._waitSecs = 1_800;
+        _waitSecs = 1_800;
 
-        Task.Run(async () => {
+        Task.Run(async () =>
+        {
             var resp = await ServerHelper.SendRequest(
-                this.Plugin.Config.ApiKey,
+                Plugin.Config.ApiKey,
                 HttpMethod.Post,
                 "/ping"
             );
 
-            if (!resp.IsSuccessStatusCode) {
+            if (!resp.IsSuccessStatusCode)
+            {
                 Plugin.Log.Warning($"Failed to ping, status {resp.StatusCode}");
             }
         });

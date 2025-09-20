@@ -2,12 +2,15 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Style;
 
-namespace OrangeGuidanceTomestone.Helpers;
+namespace NorthStar.Helpers;
 
-internal static class ImGuiHelper {
-    private static bool InternalIconButton(Func<ImU8String, bool> func, FontAwesomeIcon icon, string? id = null) {
+internal static class ImGuiHelper
+{
+    private static bool InternalIconButton(Func<ImU8String, bool> func, FontAwesomeIcon icon, string? id = null)
+    {
         var label = icon.ToIconString();
-        if (id != null) {
+        if (id != null)
+        {
             label += $"##{id}";
         }
 
@@ -18,16 +21,19 @@ internal static class ImGuiHelper {
         return ret;
     }
 
-    internal static bool SmallIconButton(FontAwesomeIcon icon, string? id = null) {
+    internal static bool SmallIconButton(FontAwesomeIcon icon, string? id = null)
+    {
         return InternalIconButton(ImGui.SmallButton, icon, id);
     }
 
-    internal static bool IconButton(FontAwesomeIcon icon, string? id = null) {
+    internal static bool IconButton(FontAwesomeIcon icon, string? id = null)
+    {
         return InternalIconButton(id => ImGui.Button(id), icon, id);
     }
 
-    internal static void HelpIcon(string text) {
-        var colour = ImGui.GetStyle().Colors[(int) ImGuiCol.TextDisabled];
+    internal static void HelpIcon(string text)
+    {
+        var colour = ImGui.GetStyle().Colors[(int)ImGuiCol.TextDisabled];
         ImGui.PushStyleColor(ImGuiCol.Text, colour);
         ImGui.TextUnformatted("(?)");
         ImGui.PopStyleColor();
@@ -35,15 +41,18 @@ internal static class ImGuiHelper {
         TextTooltip(text);
     }
 
-    internal static unsafe ImGuiListClipperPtr Clipper(int itemsCount) {
+    internal static unsafe ImGuiListClipperPtr Clipper(int itemsCount)
+    {
         var clipper = new ImGuiListClipperPtr(ImGuiNative.ImGuiListClipper());
         clipper.Begin(itemsCount);
 
         return clipper;
     }
 
-    internal static void TextTooltip(string tooltip) {
-        if (!ImGui.IsItemHovered()) {
+    internal static void TextTooltip(string tooltip)
+    {
+        if (!ImGui.IsItemHovered())
+        {
             return;
         }
 
@@ -55,10 +64,12 @@ internal static class ImGuiHelper {
         ImGui.EndTooltip();
     }
 
-    internal static void WarningText(string text) {
+    internal static void WarningText(string text)
+    {
         var style = StyleModel.GetConfiguredStyle() ?? StyleModel.GetFromCurrent();
         var dalamudOrange = style.BuiltInColors?.DalamudOrange;
-        if (dalamudOrange != null) {
+        if (dalamudOrange != null)
+        {
             ImGui.PushStyleColor(ImGuiCol.Text, dalamudOrange.Value);
         }
 
@@ -66,7 +77,8 @@ internal static class ImGuiHelper {
         ImGui.TextUnformatted(text);
         ImGui.PopTextWrapPos();
 
-        if (dalamudOrange != null) {
+        if (dalamudOrange != null)
+        {
             ImGui.PopStyleColor();
         }
     }

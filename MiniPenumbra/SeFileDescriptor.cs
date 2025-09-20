@@ -1,11 +1,12 @@
-using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
+using System.Runtime.InteropServices;
 using FileMode = FFXIVClientStructs.FFXIV.Client.System.File.FileMode;
 
-namespace OrangeGuidanceTomestone.MiniPenumbra;
+namespace NorthStar.MiniPenumbra;
 
 [StructLayout(LayoutKind.Explicit)]
-internal unsafe struct SeFileDescriptor {
+internal unsafe struct SeFileDescriptor
+{
     [FieldOffset(0x00)]
     public FileMode FileMode;
 

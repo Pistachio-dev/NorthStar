@@ -1,35 +1,37 @@
-using System.Numerics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Numerics;
 
-namespace OrangeGuidanceTomestone;
+namespace NorthStar;
 
 [Serializable]
 [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-public class Message {
-    public required Guid Id { get; init; }
-    public required float X { get; init; }
-    public required float Y { get; init; }
-    public required float Z { get; init; }
-    public required float Yaw { get; init; }
+public class Message
+{
+    public Guid Id { get; init; }
+    public float X { get; init; }
+    public float Y { get; init; }
+    public float Z { get; init; }
+    public float Yaw { get; init; }
 
     [JsonProperty("message")]
-    public required string Text { get; init; }
+    public string Text { get; init; }
 
-    public required int PositiveVotes { get; set; }
-    public required int NegativeVotes { get; set; }
-    public required int UserVote { get; set; }
+    public int PositiveVotes { get; set; }
+    public int NegativeVotes { get; set; }
+    public int UserVote { get; set; }
 
-    public required EmoteData? Emote { get; set; }
+    public EmoteData? Emote { get; set; }
 
-    public required int Glyph { get; set; }
+    public int Glyph { get; set; }
 
-    internal Vector3 Position => new(this.X, this.Y, this.Z);
+    internal Vector3 Position => new(X, Y, Z);
 }
 
 [Serializable]
 [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-public class MessageWithTerritory {
+public class MessageWithTerritory
+{
     public Guid Id { get; init; }
     public uint Territory { get; init; }
     public uint? Ward { get; init; }
@@ -52,10 +54,12 @@ public class MessageWithTerritory {
     public int Glyph { get; set; }
     public bool IsHidden { get; set; }
 
-    internal Vector3 Position => new(this.X, this.Y, this.Z);
+    internal Vector3 Position => new(X, Y, Z);
 
-    internal static MessageWithTerritory From(Message message, uint territory) {
-        return new MessageWithTerritory {
+    internal static MessageWithTerritory From(Message message, uint territory)
+    {
+        return new MessageWithTerritory
+        {
             Id = message.Id,
             Territory = territory,
             X = message.X,
@@ -75,61 +79,73 @@ public class MessageWithTerritory {
 
 [Serializable]
 [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-public class EmoteData {
-    public required uint Id { get; set; }
-    public required List<byte> Customise { get; set; }
-    public required EquipmentData[] Equipment { get; set; }
-    public required WeaponData[] Weapon { get; set; }
-    public required uint Glasses { get; set; }
-    public required bool HatHidden { get; set; }
-    public required bool VisorToggled { get; set; }
-    public required bool WeaponHidden { get; set; }
+public class EmoteData
+{
+    public uint Id { get; set; }
+    public List<byte> Customise { get; set; }
+    public EquipmentData[] Equipment { get; set; }
+    public WeaponData[] Weapon { get; set; }
+    public uint Glasses { get; set; }
+    public bool HatHidden { get; set; }
+    public bool VisorToggled { get; set; }
+    public bool WeaponHidden { get; set; }
 }
 
 [Serializable]
 [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-public class EquipmentData {
-    public required ushort Id { get; set; }
-    public required byte Variant { get; set; }
+public class EquipmentData
+{
+    public ushort Id { get; set; }
+    public byte Variant { get; set; }
+
     [JsonProperty("stain_0")]
-    public required byte Stain0 { get; set; }
+    public byte Stain0 { get; set; }
+
     [JsonProperty("stain_1")]
-    public required byte Stain1 { get; set; }
+    public byte Stain1 { get; set; }
 }
 
 [Serializable]
 [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-public class WeaponData {
-    public required WeaponModelId ModelId { get; set; }
-    public required byte State { get; set; }
+public class WeaponData
+{
+    public WeaponModelId ModelId { get; set; }
+    public byte State { get; set; }
+
     [JsonProperty("flags_1")]
-    public required ushort Flags1 { get; set; }
+    public ushort Flags1 { get; set; }
+
     [JsonProperty("flags_2")]
-    public required byte Flags2 { get; set; }
+    public byte Flags2 { get; set; }
 }
 
 [Serializable]
 [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-public class WeaponModelId {
-    public required ushort Id { get; set; }
-    public required ushort Kind { get; set; }
-    public required ushort Variant { get; set; }
+public class WeaponModelId
+{
+    public ushort Id { get; set; }
+    public ushort Kind { get; set; }
+    public ushort Variant { get; set; }
+
     [JsonProperty("stain_0")]
-    public required byte Stain0 { get; set; }
+    public byte Stain0 { get; set; }
+
     [JsonProperty("stain_1")]
-    public required byte Stain1 { get; set; }
+    public byte Stain1 { get; set; }
 }
 
 [Serializable]
 [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-public class ErrorMessage {
+public class ErrorMessage
+{
     public string Code { get; set; }
     public string Message { get; set; }
 }
 
 [Serializable]
 [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-public class MyMessages {
+public class MyMessages
+{
     public uint Extra { get; set; }
     public MessageWithTerritory[] Messages { get; set; }
 }

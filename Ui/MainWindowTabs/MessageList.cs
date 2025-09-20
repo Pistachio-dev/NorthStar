@@ -4,12 +4,13 @@ using Dalamud.Interface;
 using Dalamud.Utility;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
-using OrangeGuidanceTomestone.Helpers;
-using OrangeGuidanceTomestone.Util;
+using NorthStar.Helpers;
+using NorthStar.Util;
 
-namespace OrangeGuidanceTomestone.Ui.MainWindowTabs;
+namespace NorthStar.Ui.MainWindowTabs;
 
-internal class MessageList : ITab {
+internal class MessageList : ITab
+{
     public string Name => "Your messages";
     private Plugin Plugin { get; }
     private SortMode Sort { get; set; }
@@ -17,49 +18,64 @@ internal class MessageList : ITab {
     private SemaphoreSlim MessagesMutex { get; } = new(1, 1);
     private List<MessageWithTerritory> Messages { get; } = [];
 
-    internal MessageList(Plugin plugin) {
-        this.Plugin = plugin;
+    internal MessageList(Plugin plugin)
+    {
+        Plugin = plugin;
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
     }
 
-    public void Draw() {
-        if (ImGui.Button("Refresh")) {
-            this.Refresh();
+    public void Draw()
+    {
+        if (ImGui.Button("Refresh"))
+        {
+            Refresh();
         }
 
         ImGui.SameLine();
 
-        if (ImGui.BeginCombo("Sort", $"{this.Sort}")) {
-            foreach (var mode in Enum.GetValues<SortMode>()) {
-                if (ImGui.Selectable($"{mode}", mode == this.Sort)) {
-                    this.Sort = mode;
+        if (ImGui.BeginCombo("Sort", $"{Sort}"))
+        {
+            foreach (var mode in Enum.GetValues<SortMode>())
+            {
+                if (ImGui.Selectable($"{mode}", mode == Sort))
+                {
+                    Sort = mode;
                 }
             }
 
             ImGui.EndCombo();
         }
 
-        this.MessagesMutex.Wait();
-        try {
-            this.ShowList();
-        } finally {
-            this.MessagesMutex.Release();
+        MessagesMutex.Wait();
+        try
+        {
+            ShowList();
+        }
+        finally
+        {
+            MessagesMutex.Release();
         }
     }
 
-    private void ShowList() {
-        ImGui.TextUnformatted($"Messages: {this.Messages.Count:N0} / {OrangeGuidanceTomestone.Messages.MaxAmount + this.Plugin.Ui.MainWindow.ExtraMessages:N0}");
+    private void ShowList()
+    {
+        ImGui.TextUnformatted($"Messages: {Messages.Count:N0} / {NorthStar.Messages.MaxAmount + Plugin.Ui.MainWindow.ExtraMessages:N0}");
 
         ImGui.Separator();
 
-        if (ImGui.BeginChild("##messages-list")) {
-            var messages = this.Messages;
-            if (this.Sort != SortMode.Date) {
+        if (ImGui.BeginChild("##messages-list"))
+        {
+            var messages = Messages;
+            if (Sort != SortMode.Date)
+            {
                 messages = messages.ToList();
-                messages.Sort((a, b) => {
-                    return this.Sort switch {
+                messages.Sort((a, b) =>
+                {
+                    return Sort switch
+                    {
                         SortMode.Date => 0,
                         SortMode.Appraisals => Math.Max(b.PositiveVotes - b.NegativeVotes, 0)
                             .CompareTo(Math.Max(a.PositiveVotes - a.NegativeVotes, 0)),
@@ -71,39 +87,51 @@ internal class MessageList : ITab {
                 });
             }
 
-            foreach (var message in messages) {
-                var territory = this.Plugin.DataManager.GetExcelSheet<TerritoryType>().GetRowOrDefault(message.Territory);
+            foreach (var message in messages)
+            {
+                var territory = Plugin.DataManager.GetExcelSheet<TerritoryType>().GetRowOrDefault(message.Territory);
                 var territoryName = territory?.PlaceName.Value.Name.ToDalamudString().TextValue ?? "???";
 
                 var loc = $"Location: {territoryName}";
-                if (message.Ward != null) {
+                if (message.Ward != null)
+                {
                     loc += " (";
 
-                    if (message.World != null) {
-                        var world = this.Plugin.DataManager.GetExcelSheet<World>().GetRowOrDefault((ushort) message.World);
-                        if (world != null) {
+                    if (message.World != null)
+                    {
+                        var world = Plugin.DataManager.GetExcelSheet<World>().GetRowOrDefault((ushort)message.World);
+                        if (world != null)
+                        {
                             loc += world.Value.Name.ToDalamudString().TextValue;
                         }
                     }
 
-                    if (loc != " (") {
+                    if (loc != " (")
+                    {
                         loc += ", ";
                     }
 
                     loc += $"Ward {message.Ward.Value}";
 
-                    if (message.Plot != null) {
-                        if (message.Plot.Value >= HousingLocationExt.Apt) {
+                    if (message.Plot != null)
+                    {
+                        if (message.Plot.Value >= HousingLocationExt.Apt)
+                        {
                             var apartment = message.Plot.Value - 10_000;
                             var wing = apartment < HousingLocationExt.Wng ? 1 : 2;
                             var apt = wing == 2 ? apartment - HousingLocationExt.Wng : apartment;
 
-                            if (apt == 0) {
+                            if (apt == 0)
+                            {
                                 loc += $", Wing {wing}, Lobby";
-                            } else {
+                            }
+                            else
+                            {
                                 loc += $", Wing {wing}, Apt. {apt}";
                             }
-                        } else {
+                        }
+                        else
+                        {
                             loc += $", Plot {message.Plot.Value}";
                         }
                     }
@@ -113,20 +141,23 @@ internal class MessageList : ITab {
 
                 ImGui.TextUnformatted(message.Text);
                 ImGui.TreePush("location");
-                using (new OnDispose(ImGui.TreePop)) {
+                using (new OnDispose(ImGui.TreePop))
+                {
                     ImGui.TextUnformatted(loc);
                     ImGui.SameLine();
 
-                    if (ImGuiHelper.SmallIconButton(FontAwesomeIcon.MapMarkerAlt, $"{message.Id}") && territory != null) {
-                        this.Plugin.GameGui.OpenMapWithMapLink(new MapLinkPayload(
+                    if (ImGuiHelper.SmallIconButton(FontAwesomeIcon.MapMarkerAlt, $"{message.Id}") && territory != null)
+                    {
+                        Plugin.GameGui.OpenMapWithMapLink(new MapLinkPayload(
                             territory.Value.RowId,
                             territory.Value.Map.RowId,
-                            (int) (message.X * 1_000),
-                            (int) (message.Z * 1_000)
+                            (int)(message.X * 1_000),
+                            (int)(message.Z * 1_000)
                         ));
                     }
 
-                    if (message.IsHidden) {
+                    if (message.IsHidden)
+                    {
                         ImGuiHelper.WarningText("This message will not be shown to other players due to its low score.");
                     }
 
@@ -135,16 +166,22 @@ internal class MessageList : ITab {
                     var appraisals = Math.Max(0, message.PositiveVotes - message.NegativeVotes);
                     ImGui.TextUnformatted($"Appraisals: {appraisals:N0} ({message.PositiveVotes:N0} - {message.NegativeVotes:N0})");
 
-                    if (!ctrl) {
+                    if (!ctrl)
+                    {
                         ImGui.BeginDisabled();
                     }
 
-                    try {
-                        if (ImGui.Button($"Delete##{message.Id}")) {
-                            this.Delete(message.Id);
+                    try
+                    {
+                        if (ImGui.Button($"Delete##{message.Id}"))
+                        {
+                            Delete(message.Id);
                         }
-                    } finally {
-                        if (!ctrl) {
+                    }
+                    finally
+                    {
+                        if (!ctrl)
+                        {
                             ImGui.EndDisabled();
                         }
                     }
@@ -160,43 +197,52 @@ internal class MessageList : ITab {
         ImGui.EndChild();
     }
 
-    private void Refresh() {
-        Task.Run(async () => {
+    private void Refresh()
+    {
+        Task.Run(async () =>
+        {
             var resp = await ServerHelper.SendRequest(
-                this.Plugin.Config.ApiKey,
+                Plugin.Config.ApiKey,
                 HttpMethod.Get,
                 "/messages?v=2"
             );
             var json = await resp.Content.ReadAsStringAsync();
             var messages = JsonConvert.DeserializeObject<MyMessages>(json)!;
-            await this.MessagesMutex.WaitAsync();
-            try {
-                this.Plugin.Ui.MainWindow.ExtraMessages = messages.Extra;
-                this.Messages.Clear();
-                this.Messages.AddRange(messages.Messages);
-            } finally {
-                this.MessagesMutex.Release();
+            await MessagesMutex.WaitAsync();
+            try
+            {
+                Plugin.Ui.MainWindow.ExtraMessages = messages.Extra;
+                Messages.Clear();
+                Messages.AddRange(messages.Messages);
+            }
+            finally
+            {
+                MessagesMutex.Release();
             }
         });
     }
 
-    private void Delete(Guid id) {
-        Task.Run(async () => {
+    private void Delete(Guid id)
+    {
+        Task.Run(async () =>
+        {
             var resp = await ServerHelper.SendRequest(
-                this.Plugin.Config.ApiKey,
+                Plugin.Config.ApiKey,
                 HttpMethod.Delete,
                 $"/messages/{id}"
             );
 
-            if (resp.IsSuccessStatusCode) {
-                this.Refresh();
-                this.Plugin.Vfx.QueueRemove(id);
-                this.Plugin.Messages.Remove(id);
+            if (resp.IsSuccessStatusCode)
+            {
+                Refresh();
+                Plugin.Vfx.QueueRemove(id);
+                Plugin.Messages.Remove(id);
             }
         });
     }
 
-    private enum SortMode {
+    private enum SortMode
+    {
         Date,
         Appraisals,
         Likes,

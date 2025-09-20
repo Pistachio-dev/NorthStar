@@ -4,81 +4,101 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.Interop;
 using Lumina.Excel.Sheets;
 
-namespace OrangeGuidanceTomestone.Util;
+namespace NorthStar.Util;
 
-internal class ActorManager : IDisposable {
+internal class ActorManager : IDisposable
+{
     private Plugin Plugin { get; }
     private readonly Stack<uint> _idx = [];
     private readonly Queue<BaseActorAction> _tasks = [];
 
-    internal ActorManager(Plugin plugin) {
-        this.Plugin = plugin;
-        this.Plugin.Framework.Update += this.OnFramework;
-        this.Plugin.ClientState.TerritoryChanged += this.OnTerritoryChange;
-        this.Plugin.Ui.Viewer.View += this.OnView;
+    internal ActorManager(Plugin plugin)
+    {
+        Plugin = plugin;
+        Plugin.Framework.Update += OnFramework;
+        Plugin.ClientState.TerritoryChanged += OnTerritoryChange;
+        Plugin.Ui.Viewer.View += OnView;
     }
 
-    public void Dispose() {
-        this.Plugin.Ui.Viewer.View -= this.OnView;
-        this.Plugin.ClientState.TerritoryChanged -= this.OnTerritoryChange;
-        this.Plugin.Framework.Update -= this.OnFramework;
+    public void Dispose()
+    {
+        Plugin.Ui.Viewer.View -= OnView;
+        Plugin.ClientState.TerritoryChanged -= OnTerritoryChange;
+        Plugin.Framework.Update -= OnFramework;
 
-        if (this._idx.Count > 0) {
-            unsafe {
+        if (_idx.Count > 0)
+        {
+            unsafe
+            {
                 var objMan = ClientObjectManager.Instance();
                 new DeleteAction().Run(this, objMan);
             }
         }
     }
 
-    private unsafe void OnFramework(IFramework framework) {
-        if (!this._tasks.TryPeek(out var actorAction)) {
+    private unsafe void OnFramework(IFramework framework)
+    {
+        if (!_tasks.TryPeek(out var actorAction))
+        {
             return;
         }
 
         var objMan = ClientObjectManager.Instance();
         var success = false;
 
-        if (actorAction.Tries < 10) {
-            try {
+        if (actorAction.Tries < 10)
+        {
+            try
+            {
                 actorAction.Tries += 1;
                 success = actorAction.Run(this, objMan);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Plugin.Log.Error(ex, "Error in actor action queue");
             }
-        } else {
+        }
+        else
+        {
             Plugin.Log.Warning("too many retries, skipping");
             success = true;
         }
 
-        if (success) {
-            this._tasks.Dequeue();
+        if (success)
+        {
+            _tasks.Dequeue();
         }
     }
 
-    private void OnTerritoryChange(ushort obj) {
-        this._idx.Clear();
+    private void OnTerritoryChange(ushort obj)
+    {
+        _idx.Clear();
     }
 
-    private void OnView(Message? message) {
+    private void OnView(Message? message)
+    {
         var msg = message == null ? "null" : "not null";
         Plugin.Log.Debug($"OnView message is {msg}");
-        this.Despawn();
+        Despawn();
 
-        if (this.Plugin.Config.ShowEmotes && message?.Emote != null) {
-            this.Spawn(message);
+        if (Plugin.Config.ShowEmotes && message?.Emote != null)
+        {
+            Spawn(message);
         }
     }
 
-    internal void Spawn(Message message) {
-        this._tasks.Enqueue(new SpawnAction(message));
+    internal void Spawn(Message message)
+    {
+        _tasks.Enqueue(new SpawnAction(message));
     }
 
-    internal void Despawn() {
-        this._tasks.Enqueue(new DeleteAction());
+    internal void Despawn()
+    {
+        _tasks.Enqueue(new DeleteAction());
     }
 
-    private abstract unsafe class BaseActorAction {
+    private abstract unsafe class BaseActorAction
+    {
         /// <summary>
         /// Run this action.
         /// </summary>
@@ -90,10 +110,13 @@ internal class ActorManager : IDisposable {
         protected IEnumerable<Pointer<BattleChara>> GetBattleCharas(
             ActorManager manager,
             Pointer<ClientObjectManager> objMan
-        ) {
-            foreach (var idx in manager._idx) {
+        )
+        {
+            foreach (var idx in manager._idx)
+            {
                 var ptr = GetChara(objMan, idx);
-                if (ptr == null) {
+                if (ptr == null)
+                {
                     continue;
                 }
 
@@ -101,21 +124,26 @@ internal class ActorManager : IDisposable {
             }
         }
 
-        private static Pointer<BattleChara>? GetChara(Pointer<ClientObjectManager> objMan, uint idx) {
-            var obj = (BattleChara*) objMan.Value->GetObjectByIndex((ushort) idx);
+        private static Pointer<BattleChara>? GetChara(Pointer<ClientObjectManager> objMan, uint idx)
+        {
+            var obj = (BattleChara*)objMan.Value->GetObjectByIndex((ushort)idx);
             return obj == null ? null : obj;
         }
     }
 
-    private unsafe class SpawnAction(Message message) : BaseActorAction {
-        public override bool Run(ActorManager manager, ClientObjectManager* objMan) {
-            if (message.Emote == null) {
+    private unsafe class SpawnAction(Message message) : BaseActorAction
+    {
+        public override bool Run(ActorManager manager, ClientObjectManager* objMan)
+        {
+            if (message.Emote == null)
+            {
                 Plugin.Log.Warning("refusing to spawn an actor for a message without an emote");
                 return true;
             }
 
             var idx = objMan->CreateBattleCharacter();
-            if (idx == 0xFFFFFFFF) {
+            if (idx == 0xFFFFFFFF)
+            {
                 Plugin.Log.Debug("actor could not be spawned");
                 return true;
             }
@@ -124,7 +152,7 @@ internal class ActorManager : IDisposable {
             var emote = message.Emote;
             var emoteRow = manager.GetValidEmote(emote.Id);
 
-            var chara = (BattleChara*) objMan->GetObjectByIndex((ushort) idx);
+            var chara = (BattleChara*)objMan->GetObjectByIndex((ushort)idx);
 
             chara->ObjectKind = ObjectKind.BattleNpc;
             chara->TargetableStatus = 0;
@@ -133,20 +161,24 @@ internal class ActorManager : IDisposable {
             var drawData = &chara->DrawData;
 
             var maxLen = Math.Min(sizeof(CustomizeData), emote.Customise.Count);
-            var rawCustomise = (byte*) &drawData->CustomizeData;
-            for (var i = 0; i < maxLen; i++) {
+            var rawCustomise = (byte*)&drawData->CustomizeData;
+            for (var i = 0; i < maxLen; i++)
+            {
                 rawCustomise[i] = emote.Customise[i];
             }
 
             // check if data is valid to prevent crashes
-            if (!(&drawData->CustomizeData)->NormalizeCustomizeData(&drawData->CustomizeData)) {
+            if (!(&drawData->CustomizeData)->NormalizeCustomizeData(&drawData->CustomizeData))
+            {
                 drawData->CustomizeData = new CustomizeData();
             }
 
             // weapon and equipment values don't cause crashes, just transparent body parts
-            for (var i = 0; i < Math.Min(drawData->EquipmentModelIds.Length, emote.Equipment.Length); i++) {
+            for (var i = 0; i < Math.Min(drawData->EquipmentModelIds.Length, emote.Equipment.Length); i++)
+            {
                 var equip = emote.Equipment[i];
-                drawData->Equipment((DrawDataContainer.EquipmentSlot) i) = new EquipmentModelId {
+                drawData->Equipment((DrawDataContainer.EquipmentSlot)i) = new EquipmentModelId
+                {
                     Id = equip.Id,
                     Variant = equip.Variant,
                     Stain0 = equip.Stain0,
@@ -154,19 +186,22 @@ internal class ActorManager : IDisposable {
                 };
             }
 
-            if (emoteRow is { DrawsWeapon: true }) {
-                for (var i = 0; i < Math.Min(drawData->WeaponData.Length, emote.Weapon.Length); i++) {
+            if (emoteRow is { DrawsWeapon: true })
+            {
+                for (var i = 0; i < Math.Min(drawData->WeaponData.Length, emote.Weapon.Length); i++)
+                {
                     var weapon = emote.Weapon[i];
-                    drawData->Weapon((DrawDataContainer.WeaponSlot) i).ModelId = new FFXIVClientStructs.FFXIV.Client.Game.Character.WeaponModelId {
+                    drawData->Weapon((DrawDataContainer.WeaponSlot)i).ModelId = new FFXIVClientStructs.FFXIV.Client.Game.Character.WeaponModelId
+                    {
                         Id = weapon.ModelId.Id,
                         Type = weapon.ModelId.Kind,
                         Variant = weapon.ModelId.Variant,
                         Stain0 = weapon.ModelId.Stain0,
                         Stain1 = weapon.ModelId.Stain1,
                     };
-                    drawData->Weapon((DrawDataContainer.WeaponSlot) i).Flags1 = weapon.Flags1;
-                    drawData->Weapon((DrawDataContainer.WeaponSlot) i).Flags2 = weapon.Flags2;
-                    drawData->Weapon((DrawDataContainer.WeaponSlot) i).State = weapon.State;
+                    drawData->Weapon((DrawDataContainer.WeaponSlot)i).Flags1 = weapon.Flags1;
+                    drawData->Weapon((DrawDataContainer.WeaponSlot)i).Flags2 = weapon.Flags2;
+                    drawData->Weapon((DrawDataContainer.WeaponSlot)i).State = weapon.State;
                 }
             }
 
@@ -174,7 +209,7 @@ internal class ActorManager : IDisposable {
             drawData->IsVisorToggled = emote.VisorToggled;
             drawData->IsWeaponHidden = emote.WeaponHidden;
 
-            drawData->SetGlasses(0, (ushort) emote.Glasses);
+            drawData->SetGlasses(0, (ushort)emote.Glasses);
 
             chara->Alpha = Math.Clamp(manager.Plugin.Config.EmoteAlpha / 100, 0, 1);
 
@@ -183,35 +218,45 @@ internal class ActorManager : IDisposable {
         }
     }
 
-    private Emote? GetValidEmote(uint rowId) {
-        var emote = this.Plugin.DataManager.GetExcelSheet<Emote>().GetRowOrDefault(rowId);
-        if (emote == null) {
+    private Emote? GetValidEmote(uint rowId)
+    {
+        var emote = Plugin.DataManager.GetExcelSheet<Emote>().GetRowOrDefault(rowId);
+        if (emote == null)
+        {
             return null;
         }
 
         return emote.Value.TextCommand.RowId == 0 ? null : emote;
     }
 
-    private unsafe class EnableAction(ActionTimeline? action) : BaseActorAction {
-        public override bool Run(ActorManager manager, ClientObjectManager* objMan) {
+    private unsafe class EnableAction(ActionTimeline? action) : BaseActorAction
+    {
+        public override bool Run(ActorManager manager, ClientObjectManager* objMan)
+        {
             var allReady = true;
-            foreach (var chara in this.GetBattleCharas(manager, objMan)) {
-                if (!chara.Value->IsReadyToDraw()) {
+            foreach (var chara in GetBattleCharas(manager, objMan))
+            {
+                if (!chara.Value->IsReadyToDraw())
+                {
                     allReady = false;
                     continue;
                 }
 
                 chara.Value->EnableDraw();
 
-                if (action == null) {
+                if (action == null)
+                {
                     continue;
                 }
 
                 chara.Value->SetMode(CharacterModes.AnimLock, 0);
-                if (action.Value.Slot == 0) {
-                    chara.Value->Timeline.TimelineSequencer.PlayTimeline((ushort) action.Value.RowId);
-                } else {
-                    chara.Value->Timeline.BaseOverride = (ushort) action.Value.RowId;
+                if (action.Value.Slot == 0)
+                {
+                    chara.Value->Timeline.TimelineSequencer.PlayTimeline((ushort)action.Value.RowId);
+                }
+                else
+                {
+                    chara.Value->Timeline.BaseOverride = (ushort)action.Value.RowId;
                 }
             }
 
@@ -219,12 +264,15 @@ internal class ActorManager : IDisposable {
         }
     }
 
-    private unsafe class DeleteAction : BaseActorAction {
-        public override bool Run(ActorManager manager, ClientObjectManager* objMan) {
-            foreach (var wrapper in this.GetBattleCharas(manager, objMan)) {
+    private unsafe class DeleteAction : BaseActorAction
+    {
+        public override bool Run(ActorManager manager, ClientObjectManager* objMan)
+        {
+            foreach (var wrapper in GetBattleCharas(manager, objMan))
+            {
                 wrapper.Value->DisableDraw();
-                var idx = objMan->GetIndexByObject((GameObject*) wrapper.Value);
-                objMan->DeleteObjectByIndex((ushort) idx, 0);
+                var idx = objMan->GetIndexByObject((GameObject*)wrapper.Value);
+                objMan->DeleteObjectByIndex((ushort)idx, 0);
             }
 
             manager._idx.Clear();

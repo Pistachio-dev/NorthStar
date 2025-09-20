@@ -1,13 +1,17 @@
-namespace OrangeGuidanceTomestone.Util;
+namespace NorthStar.Util;
 
-internal static class SemaphoreExt {
-    internal static OnDispose With(this SemaphoreSlim semaphore) {
+internal static class SemaphoreExt
+{
+    internal static OnDispose With(this SemaphoreSlim semaphore)
+    {
         semaphore.Wait();
         return new OnDispose(() => semaphore.Release());
     }
 
-    internal static bool With(this SemaphoreSlim semaphore, TimeSpan timeout, out OnDispose? releaser) {
-        if (semaphore.Wait(timeout)) {
+    internal static bool With(this SemaphoreSlim semaphore, TimeSpan timeout, out OnDispose? releaser)
+    {
+        if (semaphore.Wait(timeout))
+        {
             releaser = new OnDispose(() => semaphore.Release());
             return true;
         }
@@ -16,7 +20,8 @@ internal static class SemaphoreExt {
         return false;
     }
 
-    internal static async Task<OnDispose> WithAsync(this SemaphoreSlim semaphore, CancellationToken token = default) {
+    internal static async Task<OnDispose> WithAsync(this SemaphoreSlim semaphore, CancellationToken token = default)
+    {
         await semaphore.WaitAsync(token);
         return new OnDispose(() => semaphore.Release());
     }

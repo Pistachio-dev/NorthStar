@@ -1,15 +1,16 @@
-using System.Globalization;
-using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Utility;
 using FFXIVClientStructs.Interop;
 using Lumina.Excel.Sheets;
-using OrangeGuidanceTomestone.Helpers;
-using OrangeGuidanceTomestone.Util;
+using NorthStar.Helpers;
+using NorthStar.Util;
+using System.Globalization;
+using System.Numerics;
 
-namespace OrangeGuidanceTomestone.Ui.MainWindowTabs;
+namespace NorthStar.Ui.MainWindowTabs;
 
-internal class Settings : ITab {
+internal class Settings : ITab
+{
     public string Name => "Settings";
 
     private Plugin Plugin { get; }
@@ -25,40 +26,43 @@ internal class Settings : ITab {
     private string _filter = string.Empty;
     private string _debugFilter = string.Empty;
 
-    internal Settings(Plugin plugin) {
-        this.Plugin = plugin;
+    internal Settings(Plugin plugin)
+    {
+        Plugin = plugin;
 
-        this.Territories = this.Plugin.DataManager.GetExcelSheet<TerritoryType>()
+        Territories = Plugin.DataManager.GetExcelSheet<TerritoryType>()
             .Where(row => row.RowId != 0)
             .Select(row => (row.RowId, row.PlaceName.Value.Name.ToDalamudString().TextValue))
             .Where(entry => !string.IsNullOrWhiteSpace(entry.TextValue))
             .ToList();
-        this.FilterTerritories(null);
+        FilterTerritories(null);
 
-        this.Tabs = [
-            ("General", this.DrawGeneral),
-            ("Writer", this.DrawWriter),
-            ("Viewer", this.DrawViewer),
-            ("Signs", this.DrawSigns),
-            ("Unlocks", this.DrawUnlocks),
-            ("Account", this.DrawAccount),
-            ("Debug", this.DrawDebug),
-            ("Data/privacy", this.DrawDataPrivacy),
+        Tabs = [
+            ("General", DrawGeneral),
+            ("Writer", DrawWriter),
+            ("Viewer", DrawViewer),
+            ("Signs", DrawSigns),
+            ("Unlocks", DrawUnlocks),
+            ("Account", DrawAccount),
+            ("Debug", DrawDebug),
+            ("Data/privacy", DrawDataPrivacy),
         ];
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
     }
 
-    private void FilterTerritories(string? text) {
+    private void FilterTerritories(string? text)
+    {
         var filter = !string.IsNullOrWhiteSpace(text);
 
-        var territories = this.Territories
-            .Where(terr => !this.Plugin.Config.BannedTerritories.Contains(terr.Item1))
+        var territories = Territories
+            .Where(terr => !Plugin.Config.BannedTerritories.Contains(terr.Item1))
             .Select(terr => (terr.Item1, false, terr.Item2));
 
-        var tt = this.Plugin.DataManager.GetExcelSheet<TerritoryType>();
-        this.FilteredTerritories = this.Plugin.Config.BannedTerritories
+        var tt = Plugin.DataManager.GetExcelSheet<TerritoryType>();
+        FilteredTerritories = Plugin.Config.BannedTerritories
             .OrderBy(terr => terr)
             .Select(terr => (terr, true, tt.GetRowOrDefault(terr)?.PlaceName.Value.Name.ToDalamudString().TextValue ?? $"{terr}"))
             .Concat(territories)
@@ -66,36 +70,43 @@ internal class Settings : ITab {
             .ToList();
     }
 
-    public void Draw() {
+    public void Draw()
+    {
         ImGui.PushTextWrapPos();
 
         var anyChanged = false;
         var vfx = false;
 
-        var widestTabName = this.Tabs
+        var widestTabName = Tabs
             .Select(entry => ImGui.CalcTextSize(entry.Item1).X)
             .Max();
 
         var leftOver = ImGui.GetContentRegionAvail().X - widestTabName - ImGui.GetStyle().ItemSpacing.X - ImGui.GetStyle().FrameBorderSize;
         var childHeight = ImGui.GetContentRegionAvail().Y - ImGui.GetStyle().ItemSpacing.Y * 2;
-        if (ImGui.BeginTable("##settings-tabs", 2)) {
+        if (ImGui.BeginTable("##settings-tabs", 2))
+        {
             ImGui.TableSetupColumn("##names", ImGuiTableColumnFlags.None, widestTabName + ImGui.GetStyle().ItemSpacing.X);
             ImGui.TableSetupColumn("##content", ImGuiTableColumnFlags.None, leftOver);
 
             ImGui.TableNextRow();
 
-            if (ImGui.TableSetColumnIndex(0)) {
-                for (var i = 0; i < this.Tabs.Count; i++) {
-                    var (name, _) = this.Tabs[i];
-                    if (ImGui.Selectable($"{name}##tab-{i}", i == this._tab)) {
-                        this._tab = i;
+            if (ImGui.TableSetColumnIndex(0))
+            {
+                for (var i = 0; i < Tabs.Count; i++)
+                {
+                    var (name, _) = Tabs[i];
+                    if (ImGui.Selectable($"{name}##tab-{i}", i == _tab))
+                    {
+                        _tab = i;
                     }
                 }
             }
 
-            if (ImGui.TableSetColumnIndex(1)) {
-                if (ImGui.BeginChild("##tab-content-child", new Vector2(-1, childHeight))) {
-                    var (_, draw) = this.Tabs[this._tab];
+            if (ImGui.TableSetColumnIndex(1))
+            {
+                if (ImGui.BeginChild("##tab-content-child", new Vector2(-1, childHeight)))
+                {
+                    var (_, draw) = Tabs[_tab];
                     draw(ref anyChanged, ref vfx);
                 }
 
@@ -105,145 +116,178 @@ internal class Settings : ITab {
             ImGui.EndTable();
         }
 
-        if (anyChanged) {
-            this.Plugin.SaveConfig();
+        if (anyChanged)
+        {
+            Plugin.SaveConfig();
         }
 
-        if (vfx) {
-            this.Plugin.Messages.RemoveVfx();
-            this.Plugin.Messages.Clear();
-            this.Plugin.Messages.SpawnVfx();
+        if (vfx)
+        {
+            Plugin.Messages.RemoveVfx();
+            Plugin.Messages.Clear();
+            Plugin.Messages.SpawnVfx();
         }
 
         ImGui.PopTextWrapPos();
     }
 
-    private void DrawGeneral(ref bool anyChanged, ref bool vfx) {
-        anyChanged |= vfx |= ImGui.Checkbox("Disable in trials", ref this.Plugin.Config.DisableTrials);
-        anyChanged |= vfx |= ImGui.Checkbox("Disable in Deep Dungeons", ref this.Plugin.Config.DisableDeepDungeon);
-        anyChanged |= vfx |= ImGui.Checkbox("Disable in cutscenes", ref this.Plugin.Config.DisableInCutscene);
-        anyChanged |= vfx |= ImGui.Checkbox("Disable in /gpose", ref this.Plugin.Config.DisableInGpose);
+    private void DrawGeneral(ref bool anyChanged, ref bool vfx)
+    {
+        anyChanged |= vfx |= ImGui.Checkbox("Disable in trials", ref Plugin.Config.DisableTrials);
+        anyChanged |= vfx |= ImGui.Checkbox("Disable in Deep Dungeons", ref Plugin.Config.DisableDeepDungeon);
+        anyChanged |= vfx |= ImGui.Checkbox("Disable in cutscenes", ref Plugin.Config.DisableInCutscene);
+        anyChanged |= vfx |= ImGui.Checkbox("Disable in /gpose", ref Plugin.Config.DisableInGpose);
 
         ImGui.Spacing();
         ImGui.TextUnformatted("Ban list (click to ban or unban)");
 
         ImGui.SetNextItemWidth(-1);
-        if (ImGui.InputTextWithHint("##filter", "Search...", ref this._filter, 128)) {
-            this.FilterTerritories(this._filter);
+        if (ImGui.InputTextWithHint("##filter", "Search...", ref _filter, 128))
+        {
+            FilterTerritories(_filter);
         }
 
-        if (ImGui.BeginChild("##ban-list", new Vector2(-1, -1), true)) {
+        if (ImGui.BeginChild("##ban-list", new Vector2(-1, -1), true))
+        {
             var toAdd = -1L;
             var toRemove = -1L;
 
-            var clipper = ImGuiHelper.Clipper(this.FilteredTerritories.Count);
-            while (clipper.Step()) {
-                for (var i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                    var (terrId, isBanned, name) = this.FilteredTerritories[i];
-                    if (isBanned) {
-                        this.DrawBannedTerritory(terrId, name, ref toRemove);
-                    } else {
-                        this.DrawTerritory(terrId, name, ref toAdd);
+            var clipper = ImGuiHelper.Clipper(FilteredTerritories.Count);
+            while (clipper.Step())
+            {
+                for (var i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+                {
+                    var (terrId, isBanned, name) = FilteredTerritories[i];
+                    if (isBanned)
+                    {
+                        DrawBannedTerritory(terrId, name, ref toRemove);
+                    }
+                    else
+                    {
+                        DrawTerritory(terrId, name, ref toAdd);
                     }
                 }
             }
 
             ImGui.Separator();
 
-            if (toRemove > -1) {
-                this.Plugin.Config.BannedTerritories.Remove((uint) toRemove);
-                if (this.Plugin.ClientState.TerritoryType == toRemove) {
-                    this.Plugin.Messages.SpawnVfx();
+            if (toRemove > -1)
+            {
+                Plugin.Config.BannedTerritories.Remove((uint)toRemove);
+                if (Plugin.ClientState.TerritoryType == toRemove)
+                {
+                    Plugin.Messages.SpawnVfx();
                 }
             }
 
-            if (toAdd > -1) {
-                this.Plugin.Config.BannedTerritories.Add((uint) toAdd);
-                if (this.Plugin.ClientState.TerritoryType == toAdd) {
-                    this.Plugin.Framework.RunOnFrameworkThread(() => {
-                        this.Plugin.Messages.RemoveVfx();
-                        this.Plugin.Messages.Clear();
+            if (toAdd > -1)
+            {
+                Plugin.Config.BannedTerritories.Add((uint)toAdd);
+                if (Plugin.ClientState.TerritoryType == toAdd)
+                {
+                    Plugin.Framework.RunOnFrameworkThread(() =>
+                    {
+                        Plugin.Messages.RemoveVfx();
+                        Plugin.Messages.Clear();
                     });
                 }
             }
 
-            if (toRemove > -1 || toAdd > -1) {
-                this.Plugin.SaveConfig();
-                this.FilterTerritories(this._filter);
+            if (toRemove > -1 || toAdd > -1)
+            {
+                Plugin.SaveConfig();
+                FilterTerritories(_filter);
             }
         }
 
         ImGui.EndChild();
     }
 
-    private void DrawTerritory(uint rowId, string name, ref long toAdd) {
-        if (this.Plugin.Config.BannedTerritories.Contains(rowId)) {
+    private void DrawTerritory(uint rowId, string name, ref long toAdd)
+    {
+        if (Plugin.Config.BannedTerritories.Contains(rowId))
+        {
             return;
         }
 
-        if (ImGui.Selectable($"{name}##{rowId}")) {
+        if (ImGui.Selectable($"{name}##{rowId}"))
+        {
             toAdd = rowId;
         }
     }
 
-    private void DrawBannedTerritory(uint terrId, string name, ref long toRemove) {
-        if (ImGui.Selectable($"{name}##{terrId}", true)) {
+    private void DrawBannedTerritory(uint terrId, string name, ref long toRemove)
+    {
+        if (ImGui.Selectable($"{name}##{terrId}", true))
+        {
             toRemove = terrId;
         }
     }
 
-    private void DrawWriter(ref bool anyChanged, ref bool vfx) {
-        if (ImGui.Button("Refresh packs")) {
+    private void DrawWriter(ref bool anyChanged, ref bool vfx)
+    {
+        if (ImGui.Button("Refresh packs"))
+        {
             Pack.UpdatePacks();
         }
 
-        var glyph = this.Plugin.Config.DefaultGlyph + 1;
-        if (ImGui.InputInt("Default glyph", ref glyph)) {
-            this.Plugin.Config.DefaultGlyph = Math.Min(Messages.VfxPaths.Length - 1, Math.Max(0, glyph - 1));
+        var glyph = Plugin.Config.DefaultGlyph + 1;
+        if (ImGui.InputInt("Default glyph", ref glyph))
+        {
+            Plugin.Config.DefaultGlyph = Math.Min(Messages.VfxPaths.Length - 1, Math.Max(0, glyph - 1));
             anyChanged = true;
         }
     }
 
-    private void DrawViewer(ref bool anyChanged, ref bool vfx) {
-        anyChanged |= ImGui.SliderFloat("Viewer opacity", ref this.Plugin.Config.ViewerOpacity, 0f, 100.0f, $"{this.Plugin.Config.ViewerOpacity:N3}%%");
-        anyChanged |= ImGui.Checkbox("Open the viewer automatically when near a sign", ref this.Plugin.Config.AutoViewer);
-        anyChanged |= ImGui.Checkbox("Close the viewer automatically when no signs are nearby", ref this.Plugin.Config.AutoViewerClose);
+    private void DrawViewer(ref bool anyChanged, ref bool vfx)
+    {
+        anyChanged |= ImGui.SliderFloat("Viewer opacity", ref Plugin.Config.ViewerOpacity, 0f, 100.0f, $"{Plugin.Config.ViewerOpacity:N3}%%");
+        anyChanged |= ImGui.Checkbox("Open the viewer automatically when near a sign", ref Plugin.Config.AutoViewer);
+        anyChanged |= ImGui.Checkbox("Close the viewer automatically when no signs are nearby", ref Plugin.Config.AutoViewerClose);
 
-        if (this.Plugin.Config.AutoViewerClose) {
+        if (Plugin.Config.AutoViewerClose)
+        {
             ImGui.TreePush("auto-viewer-close-sub");
-            anyChanged |= ImGui.Checkbox("Hide viewer titlebar", ref this.Plugin.Config.HideTitlebar);
+            anyChanged |= ImGui.Checkbox("Hide viewer titlebar", ref Plugin.Config.HideTitlebar);
             ImGui.TreePop();
         }
 
-        anyChanged |= ImGui.Checkbox("Lock viewer in place", ref this.Plugin.Config.LockViewer);
-        anyChanged |= ImGui.Checkbox("Click through viewer", ref this.Plugin.Config.ClickThroughViewer);
+        anyChanged |= ImGui.Checkbox("Lock viewer in place", ref Plugin.Config.LockViewer);
+        anyChanged |= ImGui.Checkbox("Click through viewer", ref Plugin.Config.ClickThroughViewer);
 
-        anyChanged |= ImGui.Checkbox("Show player emotes", ref this.Plugin.Config.ShowEmotes);
-        anyChanged |= ImGui.SliderFloat("Player emote opacity", ref this.Plugin.Config.EmoteAlpha, 0f, 100f, "%.2f%%");
+        anyChanged |= ImGui.Checkbox("Show player emotes", ref Plugin.Config.ShowEmotes);
+        anyChanged |= ImGui.SliderFloat("Player emote opacity", ref Plugin.Config.EmoteAlpha, 0f, 100f, "%.2f%%");
     }
 
-    private void DrawSigns(ref bool anyChanged, ref bool vfx) {
-        anyChanged |= vfx |= ImGui.Checkbox("Remove glow effect from signs", ref this.Plugin.Config.RemoveGlow);
-        if (ImGui.SliderFloat("Sign opacity", ref this.Plugin.Config.SignAlpha, 0, 100, "%.2f%%")) {
+    private void DrawSigns(ref bool anyChanged, ref bool vfx)
+    {
+        anyChanged |= vfx |= ImGui.Checkbox("Remove glow effect from signs", ref Plugin.Config.RemoveGlow);
+        if (ImGui.SliderFloat("Sign opacity", ref Plugin.Config.SignAlpha, 0, 100, "%.2f%%"))
+        {
             anyChanged = true;
 
-            this.WithEachVfx(vfx => {
-                unsafe {
-                    vfx.Value->Alpha = Math.Clamp(this.Plugin.Config.SignAlpha / 100.0f, 0, 1);
+            WithEachVfx(vfx =>
+            {
+                unsafe
+                {
+                    vfx.Value->Alpha = Math.Clamp(Plugin.Config.SignAlpha / 100.0f, 0, 1);
                 }
             });
         }
 
-        var intensity = (this.Plugin.Config.SignRed + this.Plugin.Config.SignGreen + this.Plugin.Config.SignBlue) / 3;
-        if (ImGui.SliderFloat("Sign intensity", ref intensity, 0, 100, "%.2f%%")) {
+        var intensity = (Plugin.Config.SignRed + Plugin.Config.SignGreen + Plugin.Config.SignBlue) / 3;
+        if (ImGui.SliderFloat("Sign intensity", ref intensity, 0, 100, "%.2f%%"))
+        {
             anyChanged = true;
-            this.Plugin.Config.SignRed = intensity;
-            this.Plugin.Config.SignGreen = intensity;
-            this.Plugin.Config.SignBlue = intensity;
+            Plugin.Config.SignRed = intensity;
+            Plugin.Config.SignGreen = intensity;
+            Plugin.Config.SignBlue = intensity;
 
             var scaled = Math.Clamp(intensity / 100.0f, 0, 1);
-            this.WithEachVfx(vfx => {
-                unsafe {
+            WithEachVfx(vfx =>
+            {
+                unsafe
+                {
                     vfx.Value->Red = scaled;
                     vfx.Value->Green = scaled;
                     vfx.Value->Blue = scaled;
@@ -251,107 +295,135 @@ internal class Settings : ITab {
             });
         }
 
-        if (ImGui.TreeNodeEx("Individual colour intensities")) {
+        if (ImGui.TreeNodeEx("Individual colour intensities"))
+        {
             using var treePop = new OnDispose(ImGui.TreePop);
 
-            if (ImGui.SliderFloat("Red intensity", ref this.Plugin.Config.SignRed, 0, 100, "%.2f%%")) {
+            if (ImGui.SliderFloat("Red intensity", ref Plugin.Config.SignRed, 0, 100, "%.2f%%"))
+            {
                 anyChanged = true;
-                this.WithEachVfx(vfx => {
-                    unsafe {
-                        vfx.Value->Red = Math.Clamp(this.Plugin.Config.SignRed / 100, 0, 1);
+                WithEachVfx(vfx =>
+                {
+                    unsafe
+                    {
+                        vfx.Value->Red = Math.Clamp(Plugin.Config.SignRed / 100, 0, 1);
                     }
                 });
             }
 
-            if (ImGui.SliderFloat("Green intensity", ref this.Plugin.Config.SignGreen, 0, 100, "%.2f%%")) {
+            if (ImGui.SliderFloat("Green intensity", ref Plugin.Config.SignGreen, 0, 100, "%.2f%%"))
+            {
                 anyChanged = true;
-                this.WithEachVfx(vfx => {
-                    unsafe {
-                        vfx.Value->Green = Math.Clamp(this.Plugin.Config.SignGreen / 100, 0, 1);
+                WithEachVfx(vfx =>
+                {
+                    unsafe
+                    {
+                        vfx.Value->Green = Math.Clamp(Plugin.Config.SignGreen / 100, 0, 1);
                     }
                 });
             }
 
-            if (ImGui.SliderFloat("Blue intensity", ref this.Plugin.Config.SignBlue, 0, 100, "%.2f%%")) {
+            if (ImGui.SliderFloat("Blue intensity", ref Plugin.Config.SignBlue, 0, 100, "%.2f%%"))
+            {
                 anyChanged = true;
-                this.WithEachVfx(vfx => {
-                    unsafe {
-                        vfx.Value->Blue = Math.Clamp(this.Plugin.Config.SignBlue / 100, 0, 1);
+                WithEachVfx(vfx =>
+                {
+                    unsafe
+                    {
+                        vfx.Value->Blue = Math.Clamp(Plugin.Config.SignBlue / 100, 0, 1);
                     }
                 });
             }
         }
     }
 
-    private void WithEachVfx(Action<Pointer<Vfx.VfxStruct>> action) {
-        if (!this.Plugin.Vfx.Mutex.With(TimeSpan.Zero, out var releaser)) {
+    private void WithEachVfx(Action<Pointer<Vfx.VfxStruct>> action)
+    {
+        if (!Plugin.Vfx.Mutex.With(TimeSpan.Zero, out var releaser))
+        {
             return;
         }
 
-        using (releaser) {
-            foreach (var (_, ptr) in this.Plugin.Vfx.Spawned) {
-                unsafe {
-                    action((Vfx.VfxStruct*) ptr);
+        using (releaser)
+        {
+            foreach (var (_, ptr) in Plugin.Vfx.Spawned)
+            {
+                unsafe
+                {
+                    action((Vfx.VfxStruct*)ptr);
                 }
             }
         }
     }
 
-    private void DrawUnlocks(ref bool anyChanged, ref bool vfx) {
-        this.ExtraCodeInput();
+    private void DrawUnlocks(ref bool anyChanged, ref bool vfx)
+    {
+        ExtraCodeInput();
     }
 
-    private void DrawAccount(ref bool anyChanged, ref bool vfx) {
-        this.DeleteAccountButton();
+    private void DrawAccount(ref bool anyChanged, ref bool vfx)
+    {
+        DeleteAccountButton();
     }
 
-    private void DrawDebug(ref bool anyChanged, ref bool vfx) {
-        if (!ImGui.BeginTabBar("debug-tabs")) {
+    private void DrawDebug(ref bool anyChanged, ref bool vfx)
+    {
+        if (!ImGui.BeginTabBar("debug-tabs"))
+        {
             return;
         }
 
         using var endTabBar = new OnDispose(ImGui.EndTabBar);
 
-        if (ImGui.BeginTabItem("VFX")) {
+        if (ImGui.BeginTabItem("VFX"))
+        {
             using var endTabItem = new OnDispose(ImGui.EndTabItem);
 
-            ImGui.Checkbox("Show debug information", ref this.Plugin.Ui.Debug);
+            ImGui.Checkbox("Show debug information", ref Plugin.Ui.Debug);
 
-            ImGui.InputText("Filter", ref this._debugFilter, 64);
+            ImGui.InputText("Filter", ref _debugFilter, 64);
 
-            if (ImGui.BeginTable("###debug-info", 2)) {
+            if (ImGui.BeginTable("###debug-info", 2))
+            {
                 using var endTable = new OnDispose(ImGui.EndTable);
 
                 ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn("VFX pointer");
                 ImGui.TableHeadersRow();
 
-                using var guard = this.Plugin.Vfx.Mutex.With();
-                foreach (var (id, ptr) in this.Plugin.Vfx.Spawned) {
+                using var guard = Plugin.Vfx.Mutex.With();
+                foreach (var (id, ptr) in Plugin.Vfx.Spawned)
+                {
                     var idLabel = id.ToString("N");
                     var ptrLabel = ptr.ToString("X");
 
-                    if (!string.IsNullOrWhiteSpace(this._debugFilter)) {
+                    if (!string.IsNullOrWhiteSpace(_debugFilter))
+                    {
                         if (
-                            !idLabel.Contains(this._debugFilter, StringComparison.CurrentCultureIgnoreCase)
-                            && !ptrLabel.Contains(this._debugFilter, StringComparison.CurrentCultureIgnoreCase)
-                        ) {
+                            !idLabel.Contains(_debugFilter, StringComparison.CurrentCultureIgnoreCase)
+                            && !ptrLabel.Contains(_debugFilter, StringComparison.CurrentCultureIgnoreCase)
+                        )
+                        {
                             continue;
                         }
                     }
 
                     ImGui.TableNextRow();
 
-                    if (ImGui.TableSetColumnIndex(0)) {
+                    if (ImGui.TableSetColumnIndex(0))
+                    {
                         ImGui.TextUnformatted(id.ToString("N"));
-                        if (ImGui.IsItemClicked()) {
+                        if (ImGui.IsItemClicked())
+                        {
                             ImGui.SetClipboardText(id.ToString("N"));
                         }
                     }
 
-                    if (ImGui.TableSetColumnIndex(1)) {
+                    if (ImGui.TableSetColumnIndex(1))
+                    {
                         ImGui.TextUnformatted(ptr.ToString("X"));
-                        if (ImGui.IsItemClicked()) {
+                        if (ImGui.IsItemClicked())
+                        {
                             ImGui.SetClipboardText(ptr.ToString("X"));
                         }
                     }
@@ -359,24 +431,28 @@ internal class Settings : ITab {
             }
         }
 
-        if (ImGui.BeginTabItem("Housing")) {
+        if (ImGui.BeginTabItem("Housing"))
+        {
             using var endTabItem = new OnDispose(ImGui.EndTabItem);
 
             var loc = HousingLocation.Current();
-            if (loc != null) {
+            if (loc != null)
+            {
                 ImGui.TextUnformatted($"Apartment: {loc.Apartment:X}h/{loc.Apartment}");
                 ImGui.TextUnformatted($"ApartmentWing: {loc.ApartmentWing:X}h/{loc.ApartmentWing}");
                 ImGui.TextUnformatted($"Ward: {loc.Ward:X}h/{loc.Ward}");
                 ImGui.TextUnformatted($"Plot: {loc.Plot:X}h/{loc.Plot}");
                 ImGui.TextUnformatted($"Yard: {loc.Yard:X}h/{loc.Yard}");
-
-            } else {
+            }
+            else
+            {
                 ImGui.TextUnformatted("loc was null");
             }
         }
     }
 
-    private void DrawDataPrivacy(ref bool anyChanged, ref bool vfx) {
+    private void DrawDataPrivacy(ref bool anyChanged, ref bool vfx)
+    {
         ImGui.PushTextWrapPos();
         using var popTextWrap = new OnDispose(ImGui.PopTextWrapPos);
 
@@ -388,59 +464,74 @@ internal class Settings : ITab {
         ImGui.TextUnformatted("Orange Guidance Tomestone does not sell or share your data, and it does not collect any personally-identifiable information. No tracking is used in this plugin.");
     }
 
-    private void ExtraCodeInput() {
-        ImGui.InputText("Extra code", ref this._extraCode, 128);
-        if (!ImGui.Button("Claim")) {
+    private void ExtraCodeInput()
+    {
+        ImGui.InputText("Extra code", ref _extraCode, 128);
+        if (!ImGui.Button("Claim"))
+        {
             return;
         }
 
-        var code = this._extraCode;
-        Task.Run(async () => {
+        var code = _extraCode;
+        Task.Run(async () =>
+        {
             var resp = await ServerHelper.SendRequest(
-                this.Plugin.Config.ApiKey,
+                Plugin.Config.ApiKey,
                 HttpMethod.Post,
                 "/claim",
                 null,
                 new StringContent(code)
             );
 
-            if (resp.IsSuccessStatusCode) {
-                this._extraCode = string.Empty;
+            if (resp.IsSuccessStatusCode)
+            {
+                _extraCode = string.Empty;
                 var text = await resp.Content.ReadAsStringAsync();
-                if (uint.TryParse(text, out var extra)) {
-                    this.Plugin.Ui.MainWindow.ExtraMessages = extra;
-                    this.Plugin.Ui.ShowModal($"Code claimed.\n\nYou can now post up to {Messages.MaxAmount + extra:N0} messages.");
-                } else {
-                    this.Plugin.Ui.ShowModal("Code claimed but the server gave an unexpected response.");
+                if (uint.TryParse(text, out var extra))
+                {
+                    Plugin.Ui.MainWindow.ExtraMessages = extra;
+                    Plugin.Ui.ShowModal($"Code claimed.\n\nYou can now post up to {Messages.MaxAmount + extra:N0} messages.");
                 }
-            } else {
-                this.Plugin.Ui.ShowModal("Invalid code.");
+                else
+                {
+                    Plugin.Ui.ShowModal("Code claimed but the server gave an unexpected response.");
+                }
+            }
+            else
+            {
+                Plugin.Ui.ShowModal("Invalid code.");
             }
         });
     }
 
-    private void DeleteAccountButton() {
+    private void DeleteAccountButton()
+    {
         var ctrl = ImGui.GetIO().KeyCtrl;
-        if (!ctrl) {
+        if (!ctrl)
+        {
             ImGui.BeginDisabled();
         }
 
-        if (ImGui.Button("Delete account")) {
-            Task.Run(async () => {
+        if (ImGui.Button("Delete account"))
+        {
+            Task.Run(async () =>
+            {
                 var resp = await ServerHelper.SendRequest(
-                    this.Plugin.Config.ApiKey,
+                    Plugin.Config.ApiKey,
                     HttpMethod.Delete,
                     "/account"
                 );
 
-                if (resp.IsSuccessStatusCode) {
-                    this.Plugin.Config.ApiKey = string.Empty;
-                    this.Plugin.SaveConfig();
+                if (resp.IsSuccessStatusCode)
+                {
+                    Plugin.Config.ApiKey = string.Empty;
+                    Plugin.SaveConfig();
                 }
             });
         }
 
-        if (!ctrl) {
+        if (!ctrl)
+        {
             ImGui.EndDisabled();
         }
 
