@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Version>1.10.4</Version>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <LangVersion>preview</LangVersion>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev</DalamudLibPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
+        <DalamudLibPath>$(DALAMUD_HOME)</DalamudLibPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(IsCI)' == 'true'">
+        <DalamudLibPath>$(HOME)/dalamud</DalamudLibPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="Dalamud">
+            <HintPath>$(DalamudLibPath)\Dalamud.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="FFXIVClientStructs">
+            <HintPath>$(DalamudLibPath)\FFXIVClientStructs.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="InteropGenerator.Runtime">
+            <HintPath>$(DalamudLibPath)\InteropGenerator.Runtime.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Dalamud.Bindings.ImGui">
+            <HintPath>$(DalamudLibPath)\Dalamud.Bindings.ImGui.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Lumina">
+            <HintPath>$(DalamudLibPath)\Lumina.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Lumina.Excel">
+            <HintPath>$(DalamudLibPath)\Lumina.Excel.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Newtonsoft.Json">
+            <HintPath>$(DalamudLibPath)\Newtonsoft.Json.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DalamudPackager" Version="13.0.0" />
+        <PackageReference Include="Fody" Version="6.9.2" PrivateAssets="all" />
+        <PackageReference Include="Resourcer.Fody" Version="1.8.1" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="vfx/sign_*.avfx"/>
+        <EmbeddedResource Include="img/sign_*.jpg"/>
+    </ItemGroup>
+
+</Project>

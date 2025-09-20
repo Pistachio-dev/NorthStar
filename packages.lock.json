@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net9.0-windows7.0": {
+      "DalamudPackager": {
+        "type": "Direct",
+        "requested": "[13.0.0, )",
+        "resolved": "13.0.0",
+        "contentHash": "Mb3cUDSK/vDPQ8gQIeuCw03EMYrej1B4J44a1AvIJ9C759p9XeqdU9Hg4WgOmlnlPe0G7ILTD32PKSUpkQNa8w=="
+      },
+      "Fody": {
+        "type": "Direct",
+        "requested": "[6.9.2, )",
+        "resolved": "6.9.2",
+        "contentHash": "YBHobPGogb0vYhGYIxn/ndWqTjNWZveDi5jdjrcshL2vjwU3gQGyDeI7vGgye+2rAM5fGRvlLgNWLW3DpviS/w=="
+      },
+      "Resourcer.Fody": {
+        "type": "Direct",
+        "requested": "[1.8.1, )",
+        "resolved": "1.8.1",
+        "contentHash": "FPeK4jKyyX5+mIjTnHNReGZk2/2xDhmu44UsBI5w9WEhbr4oTMmht3rnBr46A+GCGepC4+2N41K4vExDYiGNVQ==",
+        "dependencies": {
+          "Fody": "6.6.4"
+        }
+      }
+    }
+  }
+}
