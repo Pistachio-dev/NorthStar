@@ -96,7 +96,7 @@ public class Plugin : IDalamudPlugin
         for (var i = 0; i < Messages.VfxPaths.Length; i++)
         {
             var letter = (char)('a' + i);
-            var stream = Resourcer.Resource.AsStreamUnChecked($"OrangeGuidanceTomestone.vfx.sign_{letter}.avfx");
+            var stream = Resourcer.Resource.AsStreamUnChecked($"NorthStar.vfx.sign_{letter}.avfx");
             var path = Path.Join(configDir, $"sign_{letter}.avfx");
             stream.CopyTo(File.Create(path));
         }
