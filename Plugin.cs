@@ -3,12 +3,13 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using NorthStar.MiniPenumbra;
 using NorthStar.Util;
+using static FFXIVClientStructs.FFXIV.Client.UI.Info.InfoProxyLetter;
 
 namespace NorthStar;
 
 public class Plugin : IDalamudPlugin
 {
-    internal static string Name => "Orange Guidance Tomestone";
+    internal static string Name => "North Star";
 
     [PluginService]
     internal static IPluginLog Log { get; private set; }
@@ -51,7 +52,7 @@ public class Plugin : IDalamudPlugin
     internal VfxReplacer VfxReplacer { get; }
     internal Commands Commands { get; }
     internal Pinger Pinger { get; }
-
+    internal VfxSpawner VfxSpawner { get; }
     internal string AvfxFilePath { get; }
 
     public Plugin()
@@ -66,6 +67,7 @@ public class Plugin : IDalamudPlugin
         VfxReplacer = new VfxReplacer(this);
         Commands = new Commands(this);
         Pinger = new Pinger(this);
+        VfxSpawner = new VfxSpawner(this);
 
         if (Config.ApiKey == string.Empty)
         {
@@ -93,11 +95,17 @@ public class Plugin : IDalamudPlugin
     {
         var configDir = Interface!.GetPluginConfigDirectory();
         Directory.CreateDirectory(configDir);
+
+        var stream = Resourcer.Resource.AsStreamUnChecked($"NorthStar.vfx.PillarOfLight_groundTarget.avfx");
+        var path = Path.Join(configDir, $"PillarOfLight_groundTarget.avfx");
+        stream.CopyTo(File.Create(path));
+
+
         for (var i = 0; i < Messages.VfxPaths.Length; i++)
         {
             var letter = (char)('a' + i);
-            var stream = Resourcer.Resource.AsStreamUnChecked($"OrangeGuidanceTomestone.vfx.sign_{letter}.avfx");
-            var path = Path.Join(configDir, $"sign_{letter}.avfx");
+            stream = Resourcer.Resource.AsStreamUnChecked($"NorthStar.vfx.sign_{letter}.avfx");
+            path = Path.Join(configDir, $"sign_{letter}.avfx");
             stream.CopyTo(File.Create(path));
         }
 

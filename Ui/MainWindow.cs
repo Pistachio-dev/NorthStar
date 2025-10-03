@@ -29,6 +29,11 @@ internal class MainWindow
             return;
         }
 
+        if (ImGui.Button("Spawn on player position"))
+        {
+            Plugin.VfxSpawner.SpawnLightOnPlayerPosition();
+        }
+
         ImGui.SetNextWindowSize(new Vector2(475, 350), ImGuiCond.FirstUseEver);
         if (!ImGui.Begin(Plugin.Name, ref Visible))
         {
