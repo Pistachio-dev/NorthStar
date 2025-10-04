@@ -6,8 +6,6 @@ using NorthStar.Map;
 using NorthStar.MiniPenumbra;
 using NorthStar.Ui;
 using NorthStar.Util;
-using System;
-using static FFXIVClientStructs.FFXIV.Client.UI.Info.InfoProxyLetter;
 
 namespace NorthStar;
 
@@ -146,7 +144,6 @@ public class Plugin : IDalamudPlugin
         stream = Resourcer.Resource.AsStreamUnChecked($"NorthStar.vfx.HighFlareStar_groundTarget.avfx");
         path = Path.Join(configDir, $"HighFlareStar_groundTarget.avfx");
         stream.CopyTo(File.Create(path));
-
 
         for (var i = 0; i < Messages.VfxPaths.Length; i++)
         {

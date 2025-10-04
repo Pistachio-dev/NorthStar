@@ -1,13 +1,7 @@
 ﻿using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin.Services;
 using NorthStar.Map;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NorthStar
 {
@@ -42,6 +36,7 @@ namespace NorthStar
                 || plugin.ClientState.TerritoryType == 1095 // Normal Mount Ordeals
                 || plugin.ClientState.TerritoryType == 1095; // Extreme Mount Ordeals
         }
+
         public void SpawnLightOnPlayerPosition()
         {
             var player = plugin.ClientState.LocalPlayer;
@@ -76,7 +71,7 @@ namespace NorthStar
                 SpawnState = VfxSpawnState.Pillar;
                 return;
             }
-            
+
             if (distance < plugin.Config.StarMinDistance)
             {
                 // Despawn, they are there
@@ -84,14 +79,13 @@ namespace NorthStar
                 SpawnState = VfxSpawnState.Nothing;
                 return;
             }
-            
+
             // Spawn star
             var adjustedPosition = new Vector3(position.X, position.Y - 35, position.Z);
-            
+
             Plugin.Log.Info($"Spawning star at {adjustedPosition}");
             plugin.Vfx.QueueSpawn(Guid.NewGuid(), VfxRoute2, adjustedPosition, System.Numerics.Quaternion.Identity);
             SpawnState = VfxSpawnState.Star;
-
         }
 
         public void OnUpdate(IFramework framework)
@@ -108,9 +102,9 @@ namespace NorthStar
                 || (SpawnState == VfxSpawnState.Star && (distance > plugin.Config.PillarOfLightMinDistance || distance < plugin.Config.StarMinDistance))
                 || (SpawnState == VfxSpawnState.Nothing && distance > plugin.Config.StarMinDistance))
             {
-                    DespawnAllVFX();
-                    SpawnBeaconOnFlag(plugin.ChatCoordsReader.LastCoords);
-                    Plugin.Log.Info("Changing VFX based on distance.");
+                DespawnAllVFX();
+                SpawnBeaconOnFlag(plugin.ChatCoordsReader.LastCoords);
+                Plugin.Log.Info("Changing VFX based on distance.");
             }
         }
 

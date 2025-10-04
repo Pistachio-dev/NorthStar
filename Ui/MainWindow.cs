@@ -1,7 +1,6 @@
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
 using NorthStar.Ui.MainWindowTabs;
-using System.Numerics;
 
 namespace NorthStar.Ui;
 
@@ -13,7 +12,7 @@ internal class MainWindow : Window, IDisposable
     internal bool Visible;
     internal uint ExtraMessages;
 
-    internal MainWindow(Plugin plugin):base("NorthStar")
+    internal MainWindow(Plugin plugin) : base("NorthStar")
     {
         Plugin = plugin;
         Tabs = [
@@ -46,7 +45,6 @@ internal class MainWindow : Window, IDisposable
                 $"Map: {coords.PlaceName} " +
                 $"Region: {coords.PlaceNameRegion} " +
                 $"Terr: {coords.TerritoryType.RowId}");
-
         }
 
         if (ImGui.Button("Print player coords"))
@@ -59,7 +57,6 @@ internal class MainWindow : Window, IDisposable
             Plugin.Log.Info($"TerritoryType: {Plugin.ClientState.TerritoryType} MapId: {Plugin.ClientState.MapId}");
         }
     }
-
 
     public void Dispose()
     {

@@ -66,7 +66,7 @@ internal unsafe class VfxReplacer : IDisposable
         }
 
         var path = fileName.ToString();
-        
+
         if (VfxSpawner.Replacements.TryGetValue(path, out string? replacementPath))
         {
             Plugin.Log.Warning($"Replacing VFX with path {path} with path {replacementPath}");

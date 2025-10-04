@@ -1,13 +1,6 @@
 ﻿using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Dalamud.Utility;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NorthStar.Map
 {
@@ -26,7 +19,6 @@ namespace NorthStar.Map
         {
             plugin.ChatGui.ChatMessage += ReadCoordsFromPostedFlag;
             plugin.ClientState.TerritoryChanged += OnTerritoryChange;
-
         }
 
         private void OnTerritoryChange(ushort newTerritory)
