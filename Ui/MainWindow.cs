@@ -40,6 +40,14 @@ internal class MainWindow : Window, IDisposable
         if (ImGui.SliderFloat("Change to no VFX when at distance or closer:", ref minDistanceStar, 0, 1000))
         {
             Plugin.Config.StarMinDistance = minDistanceStar;
+            
+        }
+
+        var starOffset = Plugin.Config.StarHeightOffset;
+        if (ImGui.SliderFloat("Star height offset:", ref starOffset, -200, 200))
+        {
+            Plugin.Config.StarHeightOffset = starOffset;
+            Plugin.VfxSpawner.SpawnBeaconOnLastCoords();
         }
 
         if (ImGui.Button("Spawn on player position"))

@@ -113,7 +113,7 @@ namespace NorthStar
             }
 
             // Spawn star
-            var adjustedPosition = new Vector3(position.X, position.Y - 35, position.Z);
+            var adjustedPosition = new Vector3(position.X, position.Y + plugin.Config.StarHeightOffset, position.Z);
 
             Plugin.Log.Info($"Spawning star at {adjustedPosition}");
             plugin.Vfx.QueueSpawn(Guid.NewGuid(), VfxRoute2, adjustedPosition, System.Numerics.Quaternion.Identity);
