@@ -67,13 +67,14 @@ internal unsafe class VfxReplacer : IDisposable
 
         var path = fileName.ToString();
         
-        if (path == "bg/ex2/02_est_e3/common/vfx/eff/b0941trp1f_o.avfx")
+        if (VfxSpawner.Replacements.TryGetValue(path, out string? replacementPath))
         {
-            Plugin.Log.Warning($"Replacing VFX with path {path} with a light pillar");
-            var p = Path.Join(Plugin.AvfxFilePath, $"PillarOfLight_groundTarget.avfx");
+            Plugin.Log.Warning($"Replacing VFX with path {path} with path {replacementPath}");
+            var p = Path.Join(Plugin.AvfxFilePath, replacementPath);
 
             return DefaultRootedResourceLoad(p, resourceManager, fileDescriptor, priority, isSync);
         }
+
         var index = Array.IndexOf(Messages.VfxPaths, path);
         if (index == -1)
         {

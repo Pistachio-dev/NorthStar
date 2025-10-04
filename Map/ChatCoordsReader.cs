@@ -45,7 +45,7 @@ namespace NorthStar.Map
             }
 
             LastCoords = mapLinkPayload;
-            plugin.VfxSpawner.SpawnLightOnFlag(mapLinkPayload);
+            plugin.VfxSpawner.SpawnBeaconOnFlag(mapLinkPayload);
         }
     }
 }

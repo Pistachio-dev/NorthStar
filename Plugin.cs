@@ -141,6 +141,10 @@ public class Plugin : IDalamudPlugin
         var path = Path.Join(configDir, $"PillarOfLight_groundTarget.avfx");
         stream.CopyTo(File.Create(path));
 
+        stream = Resourcer.Resource.AsStreamUnChecked($"NorthStar.vfx.HighFlareStar_groundTarget.avfx");
+        path = Path.Join(configDir, $"HighFlareStar_groundTarget.avfx");
+        stream.CopyTo(File.Create(path));
+
 
         for (var i = 0; i < Messages.VfxPaths.Length; i++)
         {
