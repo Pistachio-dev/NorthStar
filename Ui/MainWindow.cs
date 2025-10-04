@@ -1,10 +1,11 @@
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Windowing;
 using NorthStar.Ui.MainWindowTabs;
 using System.Numerics;
 
 namespace NorthStar.Ui;
 
-internal class MainWindow
+internal class MainWindow : Window, IDisposable
 {
     private Plugin Plugin { get; }
     private List<ITab> Tabs { get; }
@@ -12,7 +13,7 @@ internal class MainWindow
     internal bool Visible;
     internal uint ExtraMessages;
 
-    internal MainWindow(Plugin plugin)
+    internal MainWindow(Plugin plugin):base("NorthStar")
     {
         Plugin = plugin;
         Tabs = [
@@ -22,76 +23,16 @@ internal class MainWindow
         ];
     }
 
-    internal void Draw()
+    public override void Draw()
     {
-        if (!Visible)
-        {
-            return;
-        }
-
         if (ImGui.Button("Spawn on player position"))
         {
             Plugin.VfxSpawner.SpawnLightOnPlayerPosition();
         }
-
-        ImGui.SetNextWindowSize(new Vector2(475, 350), ImGuiCond.FirstUseEver);
-        if (!ImGui.Begin(Plugin.Name, ref Visible))
-        {
-            ImGui.End();
-            return;
-        }
-
-        if (Plugin.Config.ApiKey == string.Empty)
-        {
-            DrawApiKey();
-        }
-        else
-        {
-            DrawTabs();
-        }
-
-        ImGui.End();
     }
 
-    private void DrawTabs()
+
+    public void Dispose()
     {
-        if (!ImGui.BeginTabBar("##ogt-main-tabs"))
-        {
-            return;
-        }
-
-        foreach (var tab in Tabs)
-        {
-            if (!ImGui.BeginTabItem(tab.Name))
-            {
-                continue;
-            }
-
-            if (ImGui.BeginChild("##tab-content"))
-            {
-                tab.Draw();
-            }
-
-            ImGui.EndChild();
-
-            ImGui.EndTabItem();
-        }
-
-        ImGui.EndTabBar();
-    }
-
-    private void DrawApiKey()
-    {
-        ImGui.PushTextWrapPos();
-
-        ImGui.TextUnformatted($"Somehow, {Plugin.Name} wasn't able to register you an account automatically.");
-        ImGui.TextUnformatted("Click the button below to try again.");
-
-        ImGui.PopTextWrapPos();
-
-        if (ImGui.Button("Register"))
-        {
-            Plugin.GetApiKey();
-        }
     }
 }

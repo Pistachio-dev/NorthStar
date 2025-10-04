@@ -1,8 +1,11 @@
+using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using NorthStar.MiniPenumbra;
+using NorthStar.Ui;
 using NorthStar.Util;
+using System;
 using static FFXIVClientStructs.FFXIV.Client.UI.Info.InfoProxyLetter;
 
 namespace NorthStar;
@@ -10,6 +13,8 @@ namespace NorthStar;
 public class Plugin : IDalamudPlugin
 {
     internal static string Name => "North Star";
+
+    private const string CommandName = "/ns";
 
     [PluginService]
     internal static IPluginLog Log { get; private set; }
@@ -55,7 +60,10 @@ public class Plugin : IDalamudPlugin
     internal VfxSpawner VfxSpawner { get; }
     internal string AvfxFilePath { get; }
 
-    public Plugin()
+    public readonly WindowSystem WindowSystem = new("NorthStar");
+    private MainWindow MainWindow { get; init; }
+
+    public Plugin(IDalamudPluginInterface pluginInterface)
     {
         AvfxFilePath = CopyAvfxFile();
 
@@ -69,11 +77,36 @@ public class Plugin : IDalamudPlugin
         Pinger = new Pinger(this);
         VfxSpawner = new VfxSpawner(this);
 
+        CommandManager?.AddHandler(CommandName, new Dalamud.Game.Command.CommandInfo(OnCommand)
+        {
+            HelpMessage = "Open the NorthStar main window"
+        });
+
+        MainWindow = new MainWindow(this);
+        WindowSystem.AddWindow(MainWindow);
+        pluginInterface.UiBuilder.Draw += DrawUI;
+
+        // This adds a button to the plugin installer entry of this plugin which allows
+        // to toggle the display status of the configuration ui
+        pluginInterface.UiBuilder.OpenConfigUi += ToggleMainUI;
+
+        // Adds another button that is doing the same but for the main ui of the plugin
+        pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
+
         if (Config.ApiKey == string.Empty)
         {
             GetApiKey();
         }
     }
+
+    private void OnCommand(string command, string args)
+    {
+        ToggleMainUI();
+    }
+
+    private void DrawUI() => WindowSystem.Draw();
+
+    public void ToggleMainUI() => MainWindow.Toggle();
 
     public void Dispose()
     {
@@ -84,6 +117,10 @@ public class Plugin : IDalamudPlugin
         Ui.Dispose();
         Messages.Dispose();
         Vfx.Dispose();
+
+        WindowSystem.RemoveAllWindows();
+        MainWindow.Dispose();
+        CommandManager.RemoveHandler(CommandName);
     }
 
     internal void SaveConfig()

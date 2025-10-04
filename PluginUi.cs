@@ -49,11 +49,6 @@ public class PluginUi : IDisposable
         {
             DrawDebug();
         }
-
-        MainWindow.Draw();
-        ViewerButton.Draw();
-        Viewer.Draw();
-        DrawModals();
     }
 
     private void DrawModals()
