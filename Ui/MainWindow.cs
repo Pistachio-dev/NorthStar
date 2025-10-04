@@ -33,7 +33,26 @@ internal class MainWindow : Window, IDisposable
         {
             Plugin.VfxSpawner.DespawnAllVFX();
         }
+        if (ImGui.Button("Print last coords"))
+        {
+            var coords = Plugin.ChatCoordsReader.LastCoords;
+            if (coords == null)
+            {
+                Plugin.Log.Info("Coords are null");
+                return;
+            }
 
+            Plugin.Log.Info($"X: {coords.RawX} Y: {coords.RawY} " +
+                $"Map: {coords.PlaceName} " +
+                $"Region: {coords.PlaceNameRegion} " +
+                $"Terr: {coords.TerritoryType.RowId}");
+
+        }
+
+        if (ImGui.Button("Print player coords"))
+        {
+            Plugin.Log.Info(Plugin.ClientState.LocalPlayer.Position.ToString());
+        }
     }
 
 

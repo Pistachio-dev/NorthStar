@@ -2,6 +2,7 @@ using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using NorthStar.Map;
 using NorthStar.MiniPenumbra;
 using NorthStar.Ui;
 using NorthStar.Util;
@@ -58,6 +59,7 @@ public class Plugin : IDalamudPlugin
     internal Commands Commands { get; }
     internal Pinger Pinger { get; }
     internal VfxSpawner VfxSpawner { get; }
+    internal ChatCoordsReader ChatCoordsReader { get; }
     internal string AvfxFilePath { get; }
 
     public readonly WindowSystem WindowSystem = new("NorthStar");
@@ -76,6 +78,8 @@ public class Plugin : IDalamudPlugin
         Commands = new Commands(this);
         Pinger = new Pinger(this);
         VfxSpawner = new VfxSpawner(this);
+        ChatCoordsReader = new ChatCoordsReader(this);
+        ChatCoordsReader.Attach();
 
         CommandManager?.AddHandler(CommandName, new Dalamud.Game.Command.CommandInfo(OnCommand)
         {
