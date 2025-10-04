@@ -1,0 +1,14 @@
+name: Invoke build and release workflow
+
+on: workflow_dispatch
+
+jobs:
+    call-workflow:
+        uses: Pistachio-dev/Workflows/.github/workflows/ManualRelease.yml@master
+        permissions:
+            contents: write
+        with:
+            internalPluginName: "NorthStar"
+            target_repo: ${{github.action_repository}}
+        secrets:
+            token: ${{secrets.GITHUB_TOKEN}}
