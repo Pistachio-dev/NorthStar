@@ -30,4 +30,5 @@ public class Configuration : IPluginConfiguration
 
     public float PillarOfLightMinDistance = 100f;
     public float StarMinDistance = 40f;
+    public bool Enabled = true;
 }
