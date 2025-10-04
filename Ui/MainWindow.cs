@@ -29,6 +29,11 @@ internal class MainWindow : Window, IDisposable
         {
             Plugin.VfxSpawner.SpawnLightOnPlayerPosition();
         }
+        if (ImGui.Button("Remove VFX"))
+        {
+            Plugin.VfxSpawner.DespawnAllVFX();
+        }
+
     }
 
 
