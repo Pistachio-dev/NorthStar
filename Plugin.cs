@@ -5,7 +5,6 @@ using Dalamud.Plugin.Services;
 using NorthStar.Map;
 using NorthStar.MiniPenumbra;
 using NorthStar.Ui;
-using NorthStar.Util;
 
 namespace NorthStar;
 
@@ -17,8 +16,6 @@ public class Plugin : IDalamudPlugin
 
     [PluginService]
     internal static IPluginLog Log { get; private set; }
-
-    [PluginService]
     internal IDalamudPluginInterface Interface { get; init; }
 
     [PluginService]
@@ -50,12 +47,7 @@ public class Plugin : IDalamudPlugin
 
     internal Configuration Config { get; }
     internal Vfx Vfx { get; }
-    internal PluginUi Ui { get; }
-    internal Messages Messages { get; }
-    internal ActorManager ActorManager { get; }
     internal VfxReplacer VfxReplacer { get; }
-    internal Commands Commands { get; }
-    internal Pinger Pinger { get; }
     internal VfxSpawner VfxSpawner { get; }
     internal ChatCoordsReader ChatCoordsReader { get; }
     internal string AvfxFilePath { get; }
@@ -65,24 +57,20 @@ public class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
+        Interface = pluginInterface;
         AvfxFilePath = CopyAvfxFile();
 
-        Config = Interface!.GetPluginConfig() as Configuration ?? new Configuration();
+        Config = pluginInterface!.GetPluginConfig() as Configuration ?? new Configuration();
         Vfx = new Vfx(this);
-        Messages = new Messages(this);
-        Ui = new PluginUi(this);
-        ActorManager = new ActorManager(this);
         VfxReplacer = new VfxReplacer(this);
-        Commands = new Commands(this);
-        Pinger = new Pinger(this);
         VfxSpawner = new VfxSpawner(this);
-        VfxSpawner.AttachUpdateBasedOnDistance(Framework);
+        VfxSpawner.AttachUpdateBasedOnDistance(Framework!);
         ChatCoordsReader = new ChatCoordsReader(this);
         ChatCoordsReader.Attach();
 
         CommandManager?.AddHandler(CommandName, new Dalamud.Game.Command.CommandInfo(OnCommand)
         {
-            HelpMessage = "Open the NorthStar main window"
+            HelpMessage = "Open the NorthStar configuration window"
         });
 
         MainWindow = new MainWindow(this);
@@ -95,11 +83,6 @@ public class Plugin : IDalamudPlugin
 
         // Adds another button that is doing the same but for the main ui of the plugin
         pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
-
-        if (Config.ApiKey == string.Empty)
-        {
-            GetApiKey();
-        }
     }
 
     private void OnCommand(string command, string args)
@@ -113,12 +96,7 @@ public class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
-        Pinger.Dispose();
-        Commands.Dispose();
         VfxReplacer.Dispose();
-        ActorManager.Dispose();
-        Ui.Dispose();
-        Messages.Dispose();
         Vfx.Dispose();
         ChatCoordsReader.Dispose();
         VfxSpawner.Dispose();
@@ -145,26 +123,6 @@ public class Plugin : IDalamudPlugin
         path = Path.Join(configDir, $"HighFlareStar_groundTarget.avfx");
         stream.CopyTo(File.Create(path));
 
-        for (var i = 0; i < Messages.VfxPaths.Length; i++)
-        {
-            var letter = (char)('a' + i);
-            stream = Resourcer.Resource.AsStreamUnChecked($"NorthStar.vfx.sign_{letter}.avfx");
-            path = Path.Join(configDir, $"sign_{letter}.avfx");
-            stream.CopyTo(File.Create(path));
-        }
-
         return configDir;
-    }
-
-    internal void GetApiKey()
-    {
-        Task.Run(async () =>
-        {
-            var resp = await new HttpClient().PostAsync("https://tryfingerbuthole.anna.lgbt/account", null);
-            var key = await resp.Content.ReadAsStringAsync();
-            Config.ApiKey = key;
-            SaveConfig();
-            Framework.RunOnFrameworkThread(Messages.SpawnVfx);
-        });
     }
 }

@@ -74,17 +74,6 @@ internal unsafe class VfxReplacer : IDisposable
 
             return DefaultRootedResourceLoad(p, resourceManager, fileDescriptor, priority, isSync);
         }
-
-        var index = Array.IndexOf(Messages.VfxPaths, path);
-        if (index == -1)
-        {
-            goto Original;
-        }
-
-        var letter = (char)('a' + index);
-        var newPath = Path.Join(Plugin.AvfxFilePath, $"sign_{letter}.avfx");
-        return DefaultRootedResourceLoad(newPath, resourceManager, fileDescriptor, priority, isSync);
-
     Original:
         return _readSqPackHook.Original(resourceManager, fileDescriptor, priority, isSync);
     }

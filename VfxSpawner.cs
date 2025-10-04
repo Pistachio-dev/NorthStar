@@ -21,7 +21,8 @@ namespace NorthStar
         private Stopwatch stopwach = new();
         private MapLinkPayload? lastReadCoords;
 
-        public MapLinkPayload? LastReadCoords {
+        public MapLinkPayload? LastReadCoords
+        {
             get { return lastReadCoords; }
             set
             {
@@ -33,7 +34,6 @@ namespace NorthStar
                 }
 
                 Plugin.Log.Info($"New read coords: {value.XCoord}, {value.YCoord}: Map {value.Map.RowId} TerritoryType: {value.TerritoryType.RowId}");
-
             }
         }
 
@@ -67,8 +67,6 @@ namespace NorthStar
 
             plugin.Vfx.QueueSpawn(Guid.NewGuid(), "bg/ex2/02_est_e3/common/vfx/eff/b0941trp1f_o.avfx", player.Position, System.Numerics.Quaternion.Identity);
         }
-
-
 
         public void SpawnBeaconOnLastCoords()
         {
@@ -153,8 +151,6 @@ namespace NorthStar
                 Plugin.Log.Debug("Redrawing beacon VFX");
                 stopwach.Restart();
             }
-
-
         }
 
         public void DespawnAllVFX()
