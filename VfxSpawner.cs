@@ -12,6 +12,8 @@ namespace NorthStar
 {
     internal class VfxSpawner
     {
+        private const string VfxRoute1 = "vfx/monster/gimmick4/eff/m5fa_b0_g11c0w.avfx"; //Mount ordeals effect
+        private const string VfxRoute2 = "vfx/monster/gimmick4/eff/m5fa_b0_g12c0w.avfx"; //Mount ordeals effect too
         private readonly Plugin plugin;
 
         public VfxSpawner(Plugin plugin)
@@ -19,6 +21,12 @@ namespace NorthStar
             this.plugin = plugin;
         }
 
+        public bool IsTerritoryWithOriginalEffects()
+        {
+            return plugin.ClientState.MapId == 823 // Mount Ordeals map
+                || plugin.ClientState.TerritoryType == 1095 // Normal Mount Ordeals
+                || plugin.ClientState.TerritoryType == 1095; // Extreme Mount Ordeals
+        }
         public void SpawnLightOnPlayerPosition()
         {
             var player = plugin.ClientState.LocalPlayer;

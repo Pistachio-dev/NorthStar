@@ -60,6 +60,11 @@ internal unsafe class VfxReplacer : IDisposable
             goto Original;
         }
 
+        if (Plugin.VfxSpawner.IsTerritoryWithOriginalEffects())
+        {
+            goto Original;
+        }
+
         var path = fileName.ToString();
         
         if (path == "bg/ex2/02_est_e3/common/vfx/eff/b0941trp1f_o.avfx")

@@ -53,6 +53,11 @@ internal class MainWindow : Window, IDisposable
         {
             Plugin.Log.Info(Plugin.ClientState.LocalPlayer.Position.ToString());
         }
+
+        if (ImGui.Button("Print player territory"))
+        {
+            Plugin.Log.Info($"TerritoryType: {Plugin.ClientState.TerritoryType} MapId: {Plugin.ClientState.MapId}");
+        }
     }
 
 
