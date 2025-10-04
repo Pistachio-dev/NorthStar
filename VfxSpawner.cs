@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin.Services;
 using NorthStar.Map;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace NorthStar
@@ -17,7 +18,25 @@ namespace NorthStar
             {VfxRoute2, "HighFlareStar_groundTarget.avfx" }
         };
 
-        private const string CustomVFX1 = "PillarOfLight_groundTarget.avfx";
+        private Stopwatch stopwach = new();
+        private MapLinkPayload? lastReadCoords;
+
+        public MapLinkPayload? LastReadCoords {
+            get { return lastReadCoords; }
+            set
+            {
+                lastReadCoords = value;
+                if (value == null)
+                {
+                    Plugin.Log.Info("Last coords set to null");
+                    return;
+                }
+
+                Plugin.Log.Info($"New read coords: {value.XCoord}, {value.YCoord}: Map {value.Map.RowId} TerritoryType: {value.TerritoryType.RowId}");
+
+            }
+        }
+
         private readonly Plugin plugin;
 
         public VfxSpawner(Plugin plugin)
@@ -49,8 +68,21 @@ namespace NorthStar
             plugin.Vfx.QueueSpawn(Guid.NewGuid(), "bg/ex2/02_est_e3/common/vfx/eff/b0941trp1f_o.avfx", player.Position, System.Numerics.Quaternion.Identity);
         }
 
-        public void SpawnBeaconOnFlag(MapLinkPayload mapLinkPayload)
+
+
+        public void SpawnBeaconOnLastCoords()
         {
+            if (lastReadCoords == null)
+            {
+                return;
+            }
+
+            if (!DoCoordsMatchCurrentMap())
+            {
+                Plugin.Log.Info("Last received coords do not match the current map.");
+                return;
+            }
+
             DespawnAllVFX();
             var player = plugin.ClientState.LocalPlayer;
             if (player == null)
@@ -60,7 +92,7 @@ namespace NorthStar
                 return;
             }
 
-            Vector3 position = mapLinkPayload.GetPosition(plugin.ClientState);
+            Vector3 position = lastReadCoords.GetPosition(plugin.ClientState);
             float distance = Vector3.Distance(position, player.Position);
             Plugin.Log.Info("Distance: " + distance);
             if (distance > plugin.Config.PillarOfLightMinDistance)
@@ -90,22 +122,35 @@ namespace NorthStar
 
         public void OnUpdate(IFramework framework)
         {
-            if (plugin.ChatCoordsReader.LastCoords == null)
+            if (lastReadCoords == null || !DoCoordsMatchCurrentMap())
             {
                 return;
             }
 
-            var vfxPosition = plugin.ChatCoordsReader.LastCoords.GetPosition(plugin.ClientState);
-            var playerPosition = plugin.ClientState.LocalPlayer?.Position ?? Vector3.Zero;
-            var distance = Vector3.Distance(vfxPosition, playerPosition);
-            if ((SpawnState == VfxSpawnState.Pillar && distance < plugin.Config.PillarOfLightMinDistance)
-                || (SpawnState == VfxSpawnState.Star && (distance > plugin.Config.PillarOfLightMinDistance || distance < plugin.Config.StarMinDistance))
-                || (SpawnState == VfxSpawnState.Nothing && distance > plugin.Config.StarMinDistance))
+            if (!stopwach.IsRunning)
+            {
+                stopwach.Start();
+                return;
+            }
+
+            if (HasDistanceThresholdBeenCrossed())
             {
                 DespawnAllVFX();
-                SpawnBeaconOnFlag(plugin.ChatCoordsReader.LastCoords);
+                SpawnBeaconOnLastCoords();
                 Plugin.Log.Info("Changing VFX based on distance.");
+                return;
             }
+
+            if (stopwach.Elapsed > TimeSpan.FromSeconds(5))
+            {
+                // Redraw
+                DespawnAllVFX();
+                SpawnBeaconOnLastCoords();
+                Plugin.Log.Debug("Redrawing beacon VFX");
+                stopwach.Restart();
+            }
+
+
         }
 
         public void DespawnAllVFX()
@@ -116,6 +161,33 @@ namespace NorthStar
         public void Dispose()
         {
             plugin.Framework.Update -= OnUpdate;
+        }
+
+        private bool DoCoordsMatchCurrentMap()
+        {
+            if (lastReadCoords == null)
+            {
+                return false;
+            }
+
+            if (plugin.ClientState.MapId != lastReadCoords.Map.RowId
+                || plugin.ClientState.TerritoryType != lastReadCoords.TerritoryType.RowId)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool HasDistanceThresholdBeenCrossed()
+        {
+            if (lastReadCoords == null) return false;
+            var vfxPosition = lastReadCoords.GetPosition(plugin.ClientState);
+            var playerPosition = plugin.ClientState.LocalPlayer?.Position ?? Vector3.Zero;
+            var distance = Vector3.Distance(vfxPosition, playerPosition);
+            return (SpawnState == VfxSpawnState.Pillar && distance < plugin.Config.PillarOfLightMinDistance)
+                || (SpawnState == VfxSpawnState.Star && (distance > plugin.Config.PillarOfLightMinDistance || distance < plugin.Config.StarMinDistance))
+                || (SpawnState == VfxSpawnState.Nothing && distance > plugin.Config.StarMinDistance);
         }
     }
 }

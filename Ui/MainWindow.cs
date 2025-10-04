@@ -52,7 +52,7 @@ internal class MainWindow : Window, IDisposable
         }
         if (ImGui.Button("Print last coords"))
         {
-            var coords = Plugin.ChatCoordsReader.LastCoords;
+            var coords = Plugin.VfxSpawner.LastReadCoords;
             if (coords == null)
             {
                 Plugin.Log.Info("Coords are null");

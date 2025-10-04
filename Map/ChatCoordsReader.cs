@@ -13,8 +13,6 @@ namespace NorthStar.Map
             this.plugin = plugin;
         }
 
-        public MapLinkPayload? LastCoords;
-
         public void Attach()
         {
             plugin.ChatGui.ChatMessage += ReadCoordsFromPostedFlag;
@@ -23,9 +21,8 @@ namespace NorthStar.Map
 
         private void OnTerritoryChange(ushort newTerritory)
         {
-            LastCoords = null;
-            plugin.VfxSpawner.DespawnAllVFX();
-            Plugin.Log.Info($"Coordinates cleared. All VFX despawned.");
+            Plugin.Log.Info($"All VFX despawned. Checking if new location matches coordinates.");
+            plugin.VfxSpawner.SpawnBeaconOnLastCoords();
         }
 
         private void ReadCoordsFromPostedFlag(XivChatType type, int timestamp, ref SeString messageSender, ref SeString messageMessage, ref bool isHandled)
@@ -36,8 +33,10 @@ namespace NorthStar.Map
                 return;
             }
 
-            LastCoords = mapLinkPayload;
-            plugin.VfxSpawner.SpawnBeaconOnFlag(mapLinkPayload);
+            Plugin.Log.Debug($"Map: {mapLinkPayload.Map.RowId} TT: {mapLinkPayload.TerritoryType.RowId}");
+            Plugin.Log.Debug($"Local Map: {plugin.ClientState.MapId} TT: {plugin.ClientState.TerritoryType}");
+            plugin.VfxSpawner.LastReadCoords = mapLinkPayload;
+            plugin.VfxSpawner.SpawnBeaconOnLastCoords();
         }
 
         public void Dispose()
