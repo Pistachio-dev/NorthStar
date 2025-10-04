@@ -72,6 +72,10 @@ namespace NorthStar
 
         public void SpawnBeaconOnLastCoords()
         {
+            if (!plugin.Config.Enabled)
+            {
+                return;
+            }
             if (lastReadCoords == null)
             {
                 return;
@@ -141,7 +145,7 @@ namespace NorthStar
                 return;
             }
 
-            if (stopwach.Elapsed > TimeSpan.FromSeconds(5))
+            if (stopwach.Elapsed > TimeSpan.FromSeconds(4))
             {
                 // Redraw
                 DespawnAllVFX();
