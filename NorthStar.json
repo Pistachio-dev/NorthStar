@@ -10,5 +10,8 @@
     "vfx",
     "beacon",
     "guidance"
-  ]
+  ],
+    "IconUrl": "https://ffxiv.consolegameswiki.com/mediawiki/images/f/fe/Earthly_Star.png",
+    "DalamudApiLevel": 13,
+    "InternalName": "NorthStar"
 }
