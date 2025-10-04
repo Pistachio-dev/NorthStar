@@ -60,17 +60,20 @@ internal unsafe class VfxReplacer : IDisposable
             goto Original;
         }
 
-        var path = fileName.ToString();
-        var index = Array.IndexOf(Messages.VfxPaths, path);
-        if (index == -1)
+        if (Plugin.VfxSpawner.IsTerritoryWithOriginalEffects())
         {
             goto Original;
         }
 
-        var letter = (char)('a' + index);
-        var newPath = Path.Join(Plugin.AvfxFilePath, $"sign_{letter}.avfx");
-        return DefaultRootedResourceLoad(newPath, resourceManager, fileDescriptor, priority, isSync);
+        var path = fileName.ToString();
 
+        if (VfxSpawner.Replacements.TryGetValue(path, out string? replacementPath))
+        {
+            Plugin.Log.Warning($"Replacing VFX with path {path} with path {replacementPath}");
+            var p = Path.Join(Plugin.AvfxFilePath, replacementPath);
+
+            return DefaultRootedResourceLoad(p, resourceManager, fileDescriptor, priority, isSync);
+        }
     Original:
         return _readSqPackHook.Original(resourceManager, fileDescriptor, priority, isSync);
     }

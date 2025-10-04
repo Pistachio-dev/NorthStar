@@ -1,5 +1,4 @@
 <Project Sdk="Dalamud.NET.Sdk/13.0.0">
-
     <PropertyGroup>
         <Version>1.10.4</Version>
         <TargetFramework>net9.0-windows</TargetFramework>
@@ -60,12 +59,22 @@
     <ItemGroup>
         <PackageReference Include="DalamudPackager" Version="13.0.0" />
         <PackageReference Include="Fody" Version="6.9.2" PrivateAssets="all" />
-        <PackageReference Include="Resourcer.Fody" Version="1.8.1" PrivateAssets="all"/>
+        <PackageReference Include="Resourcer.Fody" Version="1.8.1" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="vfx/sign_*.avfx"/>
-        <EmbeddedResource Include="img/sign_*.jpg"/>
+        <EmbeddedResource Include="vfx/sign_*.avfx" />
+        <EmbeddedResource Include="img/sign_*.jpg" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="vfx\HighFlareStar_groundTarget.avfx" />
+      <None Remove="vfx\PillarOfLight_groundTarget.avfx" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="vfx\HighFlareStar_groundTarget.avfx" />
+      <EmbeddedResource Include="vfx\PillarOfLight_groundTarget.avfx" />
     </ItemGroup>
 
 </Project>

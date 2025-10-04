@@ -1,92 +1,49 @@
 using Dalamud.Bindings.ImGui;
-using NorthStar.Ui.MainWindowTabs;
-using System.Numerics;
+using Dalamud.Interface.Windowing;
 
 namespace NorthStar.Ui;
 
-internal class MainWindow
+internal class MainWindow : Window, IDisposable
 {
     private Plugin Plugin { get; }
-    private List<ITab> Tabs { get; }
 
     internal bool Visible;
     internal uint ExtraMessages;
 
-    internal MainWindow(Plugin plugin)
+    internal MainWindow(Plugin plugin) : base("NorthStar")
     {
         Plugin = plugin;
-        Tabs = [
-            new Write(Plugin),
-            new MessageList(Plugin),
-            new Settings(Plugin),
-        ];
     }
 
-    internal void Draw()
+    public override void Draw()
     {
-        if (!Visible)
+        ImGui.TextUnformatted("This plugin draws a very easy to spot VFX on the position of the last <flag> or <pos> in chat");
+
+        var enabled = Plugin.Config.Enabled;
+        if (ImGui.Checkbox("Enable plugin", ref enabled))
         {
-            return;
+            Plugin.Config.Enabled = enabled;
+        }
+        var minDistancePillar = Plugin.Config.PillarOfLightMinDistance;
+        if (ImGui.SliderFloat("Change to star VFX when at distance or closer:", ref minDistancePillar, 0, 1000))
+        {
+            Plugin.Config.PillarOfLightMinDistance = minDistancePillar;
+        }
+        var minDistanceStar = Plugin.Config.StarMinDistance;
+        if (ImGui.SliderFloat("Change to no VFX when at distance or closer:", ref minDistanceStar, 0, 1000))
+        {
+            Plugin.Config.StarMinDistance = minDistanceStar;
         }
 
-        ImGui.SetNextWindowSize(new Vector2(475, 350), ImGuiCond.FirstUseEver);
-        if (!ImGui.Begin(Plugin.Name, ref Visible))
+        var starOffset = Plugin.Config.StarHeightOffset;
+        if (ImGui.SliderFloat("Star height offset:", ref starOffset, -200, 200))
         {
-            ImGui.End();
-            return;
+            Plugin.Config.StarHeightOffset = starOffset;
+            Plugin.VfxSpawner.SpawnBeaconOnLastCoords();
         }
-
-        if (Plugin.Config.ApiKey == string.Empty)
-        {
-            DrawApiKey();
-        }
-        else
-        {
-            DrawTabs();
-        }
-
-        ImGui.End();
     }
 
-    private void DrawTabs()
+    public void Dispose()
     {
-        if (!ImGui.BeginTabBar("##ogt-main-tabs"))
-        {
-            return;
-        }
-
-        foreach (var tab in Tabs)
-        {
-            if (!ImGui.BeginTabItem(tab.Name))
-            {
-                continue;
-            }
-
-            if (ImGui.BeginChild("##tab-content"))
-            {
-                tab.Draw();
-            }
-
-            ImGui.EndChild();
-
-            ImGui.EndTabItem();
-        }
-
-        ImGui.EndTabBar();
-    }
-
-    private void DrawApiKey()
-    {
-        ImGui.PushTextWrapPos();
-
-        ImGui.TextUnformatted($"Somehow, {Plugin.Name} wasn't able to register you an account automatically.");
-        ImGui.TextUnformatted("Click the button below to try again.");
-
-        ImGui.PopTextWrapPos();
-
-        if (ImGui.Button("Register"))
-        {
-            Plugin.GetApiKey();
-        }
     }
 }
