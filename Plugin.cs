@@ -78,6 +78,7 @@ public class Plugin : IDalamudPlugin
         Commands = new Commands(this);
         Pinger = new Pinger(this);
         VfxSpawner = new VfxSpawner(this);
+        VfxSpawner.AttachUpdateBasedOnDistance(Framework);
         ChatCoordsReader = new ChatCoordsReader(this);
         ChatCoordsReader.Attach();
 
@@ -121,7 +122,8 @@ public class Plugin : IDalamudPlugin
         Ui.Dispose();
         Messages.Dispose();
         Vfx.Dispose();
-
+        ChatCoordsReader.Dispose();
+        VfxSpawner.Dispose();
         WindowSystem.RemoveAllWindows();
         MainWindow.Dispose();
         CommandManager.RemoveHandler(CommandName);

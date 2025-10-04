@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace NorthStar.Map
 {
-    internal class ChatCoordsReader
+    internal class ChatCoordsReader : IDisposable
     {
         private readonly Plugin plugin;
 
@@ -46,6 +46,11 @@ namespace NorthStar.Map
 
             LastCoords = mapLinkPayload;
             plugin.VfxSpawner.SpawnBeaconOnFlag(mapLinkPayload);
+        }
+
+        public void Dispose()
+        {
+            plugin.ChatGui.ChatMessage -= ReadCoordsFromPostedFlag;
         }
     }
 }

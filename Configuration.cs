@@ -27,4 +27,7 @@ public class Configuration : IPluginConfiguration
     public float SignBlue = 100.0f;
     public float ViewerOpacity = 100.0f;
     public int DefaultGlyph = 3;
+
+    public float PillarOfLightMinDistance = 100f;
+    public float StarMinDistance = 40f;
 }
