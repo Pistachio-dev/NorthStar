@@ -1,0 +1,24 @@
+[
+  {
+    "Author": "Pistachio Herald, based on Anna's Orange Guidance Tomestone",
+    "Name": "North Star",
+    "Punchline": "Let the heaven's guide you, not the map",
+    "Description": "Shows a beacon on the position of the last <pos> or <flag> in chat. Use /northstar to configure",
+    "ApplicableVersion": "any",
+    "Tags": [
+      "map",
+      "orientation",
+      "vfx",
+      "beacon",
+      "guidance"
+    ],
+    "IconUrl": "https://ffxiv.consolegameswiki.com/mediawiki/images/f/fe/Earthly_Star.png",
+    "DalamudApiLevel": 13,
+    "AssemblyVersion": "0.1.0.0",
+    "Changelog": "- Initial Release",
+    "DownloadLinkInstall": "https://github.com/Pistachio-dev/NorthStar/releases/download/0.1.0.0_release/NorthStar.zip",
+    "DownloadLinkUpdate": "https://github.com/Pistachio-dev/NorthStar/releases/download/0.1.0.0_release/NorthStar.zip",
+    "LastUpdate": 1759695190,
+    "InternalName": "NorthStar"
+  }
+]
