@@ -115,8 +115,8 @@ public class Plugin : IDalamudPlugin
         var configDir = Interface!.GetPluginConfigDirectory();
         Directory.CreateDirectory(configDir);
 
-        var stream = Resourcer.Resource.AsStreamUnChecked($"NorthStar.vfx.PillarOfLight_groundTarget.avfx");
-        var path = Path.Join(configDir, $"PillarOfLight_groundTarget.avfx");
+        var stream = Resourcer.Resource.AsStreamUnChecked($"NorthStar.vfx.PillarOfLightWithFlareStarTop_groundTarget.avfx");
+        var path = Path.Join(configDir, $"PillarOfLightWithFlareStarTop_groundTarget.avfx");
         stream.CopyTo(File.Create(path));
 
         stream = Resourcer.Resource.AsStreamUnChecked($"NorthStar.vfx.HighFlareStar_groundTarget.avfx");

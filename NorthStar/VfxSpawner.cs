@@ -14,7 +14,7 @@ namespace NorthStar
 
         public static readonly Dictionary<string, string> Replacements = new()
         {
-            {VfxRoute1, "PillarOfLight_groundTarget.avfx" },
+            {VfxRoute1, "PillarOfLightWithFlareStarTop_groundTarget.avfx" },
             {VfxRoute2, "HighFlareStar_groundTarget.avfx" }
         };
 

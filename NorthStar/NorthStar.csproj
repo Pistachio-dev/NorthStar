@@ -69,12 +69,16 @@
 
     <ItemGroup>
       <None Remove="vfx\HighFlareStar_groundTarget.avfx" />
-      <None Remove="vfx\PillarOfLight_groundTarget.avfx" />
+      <None Remove="vfx\PillarOfLightWithFlareStarTop_groundTarget.avfx" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="NewestRelease.json" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Include="vfx\HighFlareStar_groundTarget.avfx" />
-      <EmbeddedResource Include="vfx\PillarOfLight_groundTarget.avfx" />
+      <EmbeddedResource Include="vfx\PillarOfLightWithFlareStarTop_groundTarget.avfx" />
     </ItemGroup>
 
 </Project>
