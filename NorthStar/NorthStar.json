@@ -2,7 +2,7 @@
   "Author": "Pistachio Herald, based on Anna's Orange Guidance Tomestone",
   "Name": "North Star",
   "Punchline": "Let the heavens guide you, not the map",
-  "Description": "Shows a beacon on the position of the last <pos> or <flag> in chat. Use /northstar to configure",
+  "Description": "Shows a beacon on the position of the last <pos> or <flag> in chat. Use /ns to configure",
   "ApplicableVersion": "any",
   "Tags": [
     "map",
