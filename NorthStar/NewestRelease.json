@@ -1,6 +1,6 @@
 {
-  "AssemblyVersion": "0.1.0.3",
+  "AssemblyVersion": "0.1.1.0",
   "DalamudApiLevel": 13,
-  "ChangeLog": "- Initial Release",
+  "ChangeLog": "- Added configurable refresh timer and increased the default value.\n- Added button to despawn all VFX.\n- Spawn calls now despawn previous VFX even if no new one is actually drawn, to avoid leaks.\n- Added despawning of VFX on plugin disabling.",
   "IsTest": false
 }
