@@ -70,6 +70,8 @@ namespace NorthStar
 
         public void SpawnBeaconOnLastCoords()
         {
+            DespawnAllVFX();
+
             if (!plugin.Config.Enabled)
             {
                 return;
@@ -84,8 +86,7 @@ namespace NorthStar
                 Plugin.Log.Info("Last received coords do not match the current map.");
                 return;
             }
-
-            DespawnAllVFX();
+            
             var player = plugin.ClientState.LocalPlayer;
             if (player == null)
             {
@@ -137,16 +138,14 @@ namespace NorthStar
 
             if (HasDistanceThresholdBeenCrossed())
             {
-                DespawnAllVFX();
                 SpawnBeaconOnLastCoords();
                 Plugin.Log.Info("Changing VFX based on distance.");
                 return;
             }
 
-            if (stopwach.Elapsed > TimeSpan.FromSeconds(4))
+            if (stopwach.Elapsed > TimeSpan.FromSeconds(plugin.Config.RefreshInterval))
             {
                 // Redraw
-                DespawnAllVFX();
                 SpawnBeaconOnLastCoords();
                 Plugin.Log.Debug("Redrawing beacon VFX");
                 stopwach.Restart();
@@ -160,6 +159,7 @@ namespace NorthStar
 
         public void Dispose()
         {
+            DespawnAllVFX();
             plugin.Framework.Update -= OnUpdate;
         }
 

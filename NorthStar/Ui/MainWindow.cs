@@ -1,4 +1,5 @@
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Components;
 using Dalamud.Interface.Windowing;
 
 namespace NorthStar.Ui;
@@ -40,6 +41,18 @@ internal class MainWindow : Window, IDisposable
         {
             Plugin.Config.StarHeightOffset = starOffset;
             Plugin.VfxSpawner.SpawnBeaconOnLastCoords();
+        }
+
+        var refreshInterval = Plugin.Config.RefreshInterval;
+        if (ImGui.SliderInt("Refresh VFX:", ref refreshInterval, 0, 200))
+        {
+            Plugin.Config.RefreshInterval = refreshInterval;
+        }
+
+        if (ImGuiComponents.IconButtonWithText(Dalamud.Interface.FontAwesomeIcon.TrashAlt, "Remove spawned VFX"))
+        {
+            Plugin.VfxSpawner.LastReadCoords = null;
+            Plugin.VfxSpawner.DespawnAllVFX();
         }
     }
 

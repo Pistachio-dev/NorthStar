@@ -14,5 +14,6 @@ public class Configuration : IPluginConfiguration
     public float PillarOfLightMinDistance = 100f;
     public float StarMinDistance = 40f;
     public float StarHeightOffset = -35f;
+    public int RefreshInterval = 30;
     public bool Enabled = true;
 }
