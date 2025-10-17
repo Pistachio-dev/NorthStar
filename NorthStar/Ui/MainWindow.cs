@@ -26,28 +26,30 @@ internal class MainWindow : Window, IDisposable
             Plugin.Config.Enabled = enabled;
         }
         var minDistancePillar = Plugin.Config.PillarOfLightMinDistance;
-        if (ImGui.SliderFloat("Change to star VFX when at distance or closer:", ref minDistancePillar, 0, 1000))
+        if (ImGui.SliderFloat("Change to star VFX when at distance or closer", ref minDistancePillar, 0, 1000))
         {
             Plugin.Config.PillarOfLightMinDistance = minDistancePillar;
         }
         var minDistanceStar = Plugin.Config.StarMinDistance;
-        if (ImGui.SliderFloat("Change to no VFX when at distance or closer:", ref minDistanceStar, 0, 1000))
+        if (ImGui.SliderFloat("Change to no VFX when at distance or closer", ref minDistanceStar, 0, 1000))
         {
             Plugin.Config.StarMinDistance = minDistanceStar;
         }
 
         var starOffset = Plugin.Config.StarHeightOffset;
-        if (ImGui.SliderFloat("Star height offset:", ref starOffset, -200, 200))
+        if (ImGui.SliderFloat("Star height offset", ref starOffset, -200, 200))
         {
             Plugin.Config.StarHeightOffset = starOffset;
             Plugin.VfxSpawner.SpawnBeaconOnLastCoords();
         }
 
         var refreshInterval = Plugin.Config.RefreshInterval;
-        if (ImGui.SliderInt("Refresh VFX:", ref refreshInterval, 0, 200))
+        if (ImGui.SliderInt("Refresh VFX interval (seconds)", ref refreshInterval, 0, 200))
         {
             Plugin.Config.RefreshInterval = refreshInterval;
         }
+        ImGui.SameLine();
+        ImGuiComponents.HelpMarker("After a long time, the game will start killing looping VFX to save memory. To work around this, the effect is refreshed on intervals");
 
         if (ImGuiComponents.IconButtonWithText(Dalamud.Interface.FontAwesomeIcon.TrashAlt, "Remove spawned VFX"))
         {
