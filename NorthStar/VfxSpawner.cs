@@ -86,7 +86,7 @@ namespace NorthStar
                 Plugin.Log.Info("Last received coords do not match the current map.");
                 return;
             }
-            
+
             var player = plugin.ClientState.LocalPlayer;
             if (player == null)
             {

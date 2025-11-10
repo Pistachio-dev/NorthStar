@@ -16,6 +16,7 @@ public class Plugin : IDalamudPlugin
 
     [PluginService]
     internal static IPluginLog Log { get; private set; }
+
     internal IDalamudPluginInterface Interface { get; init; }
 
     [PluginService]
