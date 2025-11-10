@@ -56,34 +56,24 @@ namespace NorthStar
                 || plugin.ClientState.TerritoryType == 1095; // Extreme Mount Ordeals
         }
 
-        public void SpawnLightOnPlayerPosition()
-        {
-            var player = plugin.ClientState.LocalPlayer;
-            if (player == null)
-            {
-                Plugin.Log.Warning($"Could not spawn VFX on player position: local player is null");
-                return;
-            }
-
-            plugin.Vfx.QueueSpawn(Guid.NewGuid(), "bg/ex2/02_est_e3/common/vfx/eff/b0941trp1f_o.avfx", player.Position, System.Numerics.Quaternion.Identity);
-        }
-
         public void SpawnBeaconOnLastCoords()
         {
             DespawnAllVFX();
 
             if (!plugin.Config.Enabled)
             {
+                Plugin.Log.Debug("VFX not spawned. Reason: Plugin disabled.");
                 return;
             }
             if (lastReadCoords == null)
             {
+                Plugin.Log.Debug("VFX not spawned. Reason: Last read coordinates are null.");
                 return;
             }
 
             if (!DoCoordsMatchCurrentMap())
             {
-                Plugin.Log.Info("Last received coords do not match the current map.");
+                Plugin.Log.Debug("VFX not spawned. Last received coords do not match the current map.");
                 return;
             }
 
@@ -97,11 +87,11 @@ namespace NorthStar
 
             Vector3 position = lastReadCoords.GetPosition(plugin.ClientState);
             float distance = Vector3.Distance(position, player.Position);
-            Plugin.Log.Info("Distance: " + distance);
+            Plugin.Log.Debug("Distance: " + distance);
             if (distance > plugin.Config.PillarOfLightMinDistance)
             {
                 // Spawn pillar
-                Plugin.Log.Info($"Spawning beacon at {position}");
+                Plugin.Log.Debug($"Spawning beacon at {position}");
                 plugin.Vfx.QueueSpawn(Guid.NewGuid(), VfxRoute1, position, System.Numerics.Quaternion.Identity);
                 SpawnState = VfxSpawnState.Pillar;
                 return;
@@ -109,7 +99,7 @@ namespace NorthStar
 
             if (distance < plugin.Config.StarMinDistance)
             {
-                // Despawn, they are there
+                // Despawn, player is already there
                 DespawnAllVFX();
                 SpawnState = VfxSpawnState.Nothing;
                 return;

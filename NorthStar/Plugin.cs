@@ -61,7 +61,7 @@ public class Plugin : IDalamudPlugin
         Interface = pluginInterface;
         AvfxFilePath = CopyAvfxFile();
 
-        Config = pluginInterface!.GetPluginConfig() as Configuration ?? new Configuration();
+        Config = pluginInterface?.GetPluginConfig() as Configuration ?? new Configuration();
         Vfx = new Vfx(this);
         VfxReplacer = new VfxReplacer(this);
         VfxSpawner = new VfxSpawner(this);
@@ -78,11 +78,8 @@ public class Plugin : IDalamudPlugin
         WindowSystem.AddWindow(MainWindow);
         pluginInterface.UiBuilder.Draw += DrawUI;
 
-        // This adds a button to the plugin installer entry of this plugin which allows
-        // to toggle the display status of the configuration ui
+        // The configuration UI is the main UI as well
         pluginInterface.UiBuilder.OpenConfigUi += ToggleMainUI;
-
-        // Adds another button that is doing the same but for the main ui of the plugin
         pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
     }
 
