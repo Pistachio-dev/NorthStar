@@ -14,11 +14,11 @@
     ],
     "IconUrl": "https://ffxiv.consolegameswiki.com/mediawiki/images/f/fe/Earthly_Star.png",
     "DalamudApiLevel": 13,
-    "AssemblyVersion": "0.1.0.3",
-    "Changelog": "- Initial Release",
-    "DownloadLinkInstall": "https://github.com/Pistachio-dev/NorthStar/releases/download/0.1.0.3_release/NorthStar.zip",
-    "DownloadLinkUpdate": "https://github.com/Pistachio-dev/NorthStar/releases/download/0.1.0.3_release/NorthStar.zip",
-    "LastUpdate": 1759746433,
+    "AssemblyVersion": "0.1.1.0",
+    "Changelog": "- Added configurable refresh timer and increased the default value.\n- Added button to despawn all VFX.\n- Spawn calls now despawn previous VFX even if no new one is actually drawn, to avoid leaks.\n- Added despawning of VFX on plugin disabling.",
+    "DownloadLinkInstall": "https://github.com/Pistachio-dev/NorthStar/releases/download/0.1.1.0_release/NorthStar.zip",
+    "DownloadLinkUpdate": "https://github.com/Pistachio-dev/NorthStar/releases/download/0.1.1.0_release/NorthStar.zip",
+    "LastUpdate": 1760692838,
     "InternalName": "NorthStar"
   }
 ]
