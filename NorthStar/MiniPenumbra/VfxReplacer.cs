@@ -67,6 +67,13 @@ internal unsafe class VfxReplacer : IDisposable
 
         var path = fileName.ToString();
 
+        if (path == @"chara/monster/m8058/obj/body/b0001/model/m8058b0001.mdl")
+        {
+            Plugin.Log.Warning("Plush detected");
+            string replacement = @"bgcommon/hou/indoor/general/0390/bgparts/fun_b0_m0390.mdl";
+            return DefaultRootedResourceLoad(replacement, resourceManager, fileDescriptor, priority, isSync);
+        }
+
         if (VfxSpawner.Replacements.TryGetValue(path, out string? replacementPath))
         {
             Plugin.Log.Warning($"Replacing VFX with path {path} with path {replacementPath}");
