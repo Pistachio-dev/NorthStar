@@ -13,7 +13,7 @@
       "guidance"
     ],
     "IconUrl": "https://ffxiv.consolegameswiki.com/mediawiki/images/f/fe/Earthly_Star.png",
-    "DalamudApiLevel": 13,
+    "DalamudApiLevel": 14,
     "AssemblyVersion": "0.1.1.1",
     "Changelog": "Code cleanup.",
     "DownloadLinkInstall": "https://github.com/Pistachio-dev/NorthStar/releases/download/0.1.1.1_release/NorthStar.zip",

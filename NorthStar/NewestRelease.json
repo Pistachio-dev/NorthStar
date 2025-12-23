@@ -1,6 +1,6 @@
 {
-  "AssemblyVersion": "0.1.1.1",
-  "DalamudApiLevel": 13,
-  "ChangeLog": "Code cleanup.",
+  "AssemblyVersion": "0.1.1.2",
+  "DalamudApiLevel": 14,
+  "ChangeLog": "Patch 7.4",
   "IsTest": false
 }
