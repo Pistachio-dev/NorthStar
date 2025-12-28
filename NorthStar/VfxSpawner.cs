@@ -82,7 +82,7 @@ namespace NorthStar
                 return;
             }
 
-            var player = plugin.ClientState.LocalPlayer;
+            var player = plugin.ObjectTable.LocalPlayer;
             if (player == null)
             {
                 SpawnState = VfxSpawnState.Nothing;
@@ -178,7 +178,7 @@ namespace NorthStar
         {
             if (lastReadCoords == null) return false;
             var vfxPosition = lastReadCoords.GetPosition(plugin.ClientState);
-            var playerPosition = plugin.ClientState.LocalPlayer?.Position ?? Vector3.Zero;
+            var playerPosition = plugin.ObjectTable.LocalPlayer?.Position ?? Vector3.Zero;
             var distance = Vector3.Distance(vfxPosition, playerPosition);
             return (SpawnState == VfxSpawnState.Pillar && distance < plugin.Config.PillarOfLightMinDistance)
                 || (SpawnState == VfxSpawnState.Star && (distance > plugin.Config.PillarOfLightMinDistance || distance < plugin.Config.StarMinDistance))
