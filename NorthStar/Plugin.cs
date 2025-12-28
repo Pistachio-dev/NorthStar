@@ -15,6 +15,7 @@ public class Plugin : IDalamudPlugin
     private const string CommandName = "/ns";
 
     [PluginService]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     internal static IPluginLog Log { get; private set; }
 
     internal IDalamudPluginInterface Interface { get; init; }
@@ -45,7 +46,10 @@ public class Plugin : IDalamudPlugin
 
     [PluginService]
     internal ITextureProvider TextureProvider { get; init; }
+    [PluginService]
+    internal IObjectTable ObjectTable { get; init; }
 
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     internal Configuration Config { get; }
     internal Vfx Vfx { get; }
     internal VfxReplacer VfxReplacer { get; }

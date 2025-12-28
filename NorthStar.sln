@@ -1,6 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthStar", "Northstar/NorthStar.csproj", "{659AF372-61D1-4134-AB48-DD3B7E7B0031}"
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthStar", "Northstar\NorthStar.csproj", "{659AF372-61D1-4134-AB48-DD3B7E7B0031}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6D10D379-51FC-4DCF-AE86-F5D85D11D28C}"
+	ProjectSection(SolutionItems) = preProject
+		Repo.json = Repo.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +20,8 @@ Global
 		{659AF372-61D1-4134-AB48-DD3B7E7B0031}.Debug|x64.Build.0 = Debug|x64
 		{659AF372-61D1-4134-AB48-DD3B7E7B0031}.Release|x64.ActiveCfg = Release|x64
 		{659AF372-61D1-4134-AB48-DD3B7E7B0031}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
