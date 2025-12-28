@@ -18,7 +18,7 @@ namespace NorthStar
             {VfxRoute2, "HighFlareStar_groundTarget.avfx" }
         };
 
-        private Stopwatch stopwach = new();
+        private Stopwatch stopwatch = new();
         private MapLinkPayload? lastReadCoords;
 
         public MapLinkPayload? LastReadCoords
@@ -120,9 +120,9 @@ namespace NorthStar
                 return;
             }
 
-            if (!stopwach.IsRunning)
+            if (!stopwatch.IsRunning)
             {
-                stopwach.Start();
+                stopwatch.Start();
                 return;
             }
 
@@ -133,12 +133,12 @@ namespace NorthStar
                 return;
             }
 
-            if (stopwach.Elapsed > TimeSpan.FromSeconds(plugin.Config.RefreshInterval))
+            if (stopwatch.Elapsed > TimeSpan.FromSeconds(plugin.Config.RefreshInterval))
             {
                 // Redraw
                 SpawnBeaconOnLastCoords();
                 Plugin.Log.Debug("Redrawing beacon VFX");
-                stopwach.Restart();
+                stopwatch.Restart();
             }
         }
 
