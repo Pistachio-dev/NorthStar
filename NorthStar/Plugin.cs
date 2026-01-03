@@ -98,6 +98,10 @@ public class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
+        Interface.UiBuilder.Draw -= WindowSystem.Draw;
+        Interface.UiBuilder.OpenConfigUi -= ToggleMainUI;
+        Interface.UiBuilder.OpenMainUi -= ToggleMainUI;
+
         VfxReplacer.Dispose();
         Vfx.Dispose();
         ChatCoordsReader.Dispose();
