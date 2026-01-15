@@ -14,11 +14,11 @@
     ],
     "IconUrl": "https://ffxiv.consolegameswiki.com/mediawiki/images/f/fe/Earthly_Star.png",
     "DalamudApiLevel": 14,
-    "AssemblyVersion": "0.1.2.2",
+    "AssemblyVersion": "0.1.2.3",
     "Changelog": "Patch 7.4",
-    "DownloadLinkInstall": "https://github.com//releases/download/0.1.2.2_release/NorthStar.zip",
-    "DownloadLinkUpdate": "https://github.com//releases/download/0.1.2.2_release/NorthStar.zip",
-    "LastUpdate": 1768472820,
+    "DownloadLinkInstall": "https://github.com/Pistachio-dev/NorthStar/releases/download/0.1.2.3_release/NorthStar.zip",
+    "DownloadLinkUpdate": "https://github.com/Pistachio-dev/NorthStar/releases/download/0.1.2.3_release/NorthStar.zip",
+    "LastUpdate": 1768475625,
     "InternalName": "NorthStar"
   }
 ]
