@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.Text;
+﻿using Dalamud.Game.Chat;
+using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 
@@ -19,15 +20,15 @@ namespace NorthStar.Map
             plugin.ClientState.TerritoryChanged += OnTerritoryChange;
         }
 
-        private void OnTerritoryChange(ushort newTerritory)
+        private void OnTerritoryChange(uint newTerritory)
         {
             Plugin.Log.Info($"All VFX despawned. Checking if new location matches coordinates.");
             plugin.VfxSpawner.SpawnBeaconOnLastCoords();
         }
 
-        private void ReadCoordsFromPostedFlag(XivChatType type, int timestamp, ref SeString messageSender, ref SeString messageMessage, ref bool isHandled)
+        private void ReadCoordsFromPostedFlag(IHandleableChatMessage messageRaw)
         {
-            MapLinkPayload? mapLinkPayload = (MapLinkPayload?)messageMessage.Payloads.FirstOrDefault(p => p is MapLinkPayload);
+            MapLinkPayload? mapLinkPayload = (MapLinkPayload?)messageRaw.Message.Payloads.FirstOrDefault(p => p is MapLinkPayload);
             if (mapLinkPayload == null)
             {
                 return;

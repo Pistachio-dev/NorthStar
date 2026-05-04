@@ -58,6 +58,11 @@ namespace NorthStar
 
         public void SpawnBeaconOnLastCoords()
         {
+            if (plugin.ClientState.IsPvP)
+            {
+                return;
+            }
+
             DespawnAllVFX();
 
             if (!plugin.Config.Enabled)
@@ -85,7 +90,7 @@ namespace NorthStar
                 return;
             }
 
-            Vector3 position = lastReadCoords.GetPosition(plugin.ClientState);
+            Vector3 position = lastReadCoords.GetPosition(plugin.ObjectTable);
             float distance = Vector3.Distance(position, player.Position);
             Plugin.Log.Debug("Distance: " + distance);
             if (distance > plugin.Config.PillarOfLightMinDistance)
@@ -172,7 +177,7 @@ namespace NorthStar
         private bool HasDistanceThresholdBeenCrossed()
         {
             if (lastReadCoords == null) return false;
-            var vfxPosition = lastReadCoords.GetPosition(plugin.ClientState);
+            var vfxPosition = lastReadCoords.GetPosition(plugin.ObjectTable);
             var playerPosition = plugin.ObjectTable.LocalPlayer?.Position ?? Vector3.Zero;
             var distance = Vector3.Distance(vfxPosition, playerPosition);
             return (SpawnState == VfxSpawnState.Pillar && distance < plugin.Config.PillarOfLightMinDistance)
