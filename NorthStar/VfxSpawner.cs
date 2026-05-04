@@ -58,10 +58,6 @@ namespace NorthStar
 
         public void SpawnBeaconOnLastCoords()
         {
-            if (plugin.ClientState.IsPvP)
-            {
-                return;
-            }
 
             DespawnAllVFX();
 
