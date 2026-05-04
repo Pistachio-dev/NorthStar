@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.Text.SeStringHandling.Payloads;
+﻿using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin.Services;
 using NorthStar.Map;
 using System.Diagnostics;
@@ -57,9 +58,11 @@ namespace NorthStar
         }
 
         public void SpawnBeaconOnLastCoords()
-        {
-
+        {           
             DespawnAllVFX();
+            if (plugin.Condition.Any(ConditionFlag.WatchingCutscene, ConditionFlag.WatchingCutscene78, ConditionFlag.OccupiedInCutSceneEvent){
+                return;
+            }
 
             if (!plugin.Config.Enabled)
             {
