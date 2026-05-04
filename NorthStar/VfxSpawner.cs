@@ -60,7 +60,7 @@ namespace NorthStar
         public void SpawnBeaconOnLastCoords()
         {           
             DespawnAllVFX();
-            if (plugin.Condition.Any(ConditionFlag.WatchingCutscene, ConditionFlag.WatchingCutscene78, ConditionFlag.OccupiedInCutSceneEvent){
+            if (plugin.Condition.Any(ConditionFlag.WatchingCutscene, ConditionFlag.WatchingCutscene78, ConditionFlag.OccupiedInCutSceneEvent)){
                 return;
             }
 
