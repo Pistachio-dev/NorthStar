@@ -6,9 +6,9 @@ namespace NorthStar.Map
 {
     internal static class MapLinkPayloadExtensions
     {
-        internal static Vector3 GetPosition(this MapLinkPayload payload, IClientState clientState)
+        internal static Vector3 GetPosition(this MapLinkPayload payload, IObjectTable objectTable)
         {
-            var YCoord = clientState.LocalPlayer?.Position.Y ?? 0;
+            var YCoord = objectTable.LocalPlayer?.Position.Y ?? 0;
             return new Vector3(payload.RawX / 1000, YCoord, payload.RawY / 1000);
         }
     }
