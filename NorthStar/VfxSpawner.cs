@@ -58,7 +58,11 @@ namespace NorthStar
         }
 
         public void SpawnBeaconOnLastCoords()
-        {           
+        {
+            if (plugin.ClientState.IsPvP)
+            {
+                return;
+            }
             DespawnAllVFX();
             if (plugin.Condition.Any(ConditionFlag.WatchingCutscene, ConditionFlag.WatchingCutscene78, ConditionFlag.OccupiedInCutSceneEvent)){
                 return;
