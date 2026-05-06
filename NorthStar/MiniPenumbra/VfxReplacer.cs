@@ -1,5 +1,7 @@
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
+using System;
+using System.IO;
 using FileMode = FFXIVClientStructs.FFXIV.Client.System.File.FileMode;
 
 namespace NorthStar.MiniPenumbra;
