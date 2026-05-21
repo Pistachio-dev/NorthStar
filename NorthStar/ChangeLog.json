@@ -1,5 +1,11 @@
 [
   {
+    "AssemblyVersion": "0.1.3.2",
+    "DalamudApiLevel": 15,
+    "ChangeLog": "-Patch 7.5\n -VFX now are hidden on cutscenes",
+    "IsTest": false
+  },
+  {
     "AssemblyVersion": "0.1.3.1",
     "DalamudApiLevel": 15,
     "ChangeLog": "-Patch 7.5\n -VFX now are hidden on cutscenes",
